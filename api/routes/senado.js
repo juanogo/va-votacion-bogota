@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var Alcaldia = require('../models/Alcaldia.js');
+var Senado = require('../models/Senado.js');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  Alcaldia.aggregate([
+  Senado.aggregate([
     {
       $lookup: {
         from: 'candidatos',
@@ -43,7 +43,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/year/:year', function (req, res, next) {
-  Alcaldia.aggregate([
+  Senado.aggregate([
     {
       $match: {
         anio: Number(req.params.year)
@@ -87,7 +87,7 @@ router.get('/year/:year', function (req, res, next) {
 })
 
 router.get('/zone/:zone', function (req, res, next) {
-  Alcaldia.aggregate([
+  Senado.aggregate([
     {
       $match: {
         zona: Number(req.params.zone)
@@ -131,7 +131,7 @@ router.get('/zone/:zone', function (req, res, next) {
 })
 
 router.post('/groupedbyparty', function (req, res, next) {
-  Alcaldia.aggregate([
+  Senado.aggregate([
     {
       $match: req.body
     },
