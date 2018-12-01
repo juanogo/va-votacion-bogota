@@ -9,5 +9,6 @@ router.get('/', function (req, res, next) {
 // Load here the whole api routes
 router.use("/alcaldia", require("./alcaldia"));
 router.use("/senado", require("./senado"));
+router.use("/all", require("./all"));
 
 module.exports = router;
