@@ -16,19 +16,27 @@ export class RadarChartComponent implements AfterContentInit {
 
   ngAfterContentInit() {
     var data = [{
-      name: "Senado",
+      name: "Partido 1",
       values : [
-        {axis: "partido 1", value: 20},
-        {axis: "partido 2", value: 10},
-        {axis: "partido 3", value: 15}
+        {axis: "Senado", value: 20},
+        {axis: "Camara", value: 10},
+        {axis: "Concejo", value: 15}
       ],
       total: 45
     },{
-      name: "Camara",
+      name: "Partido 2",
       values : [
-        {axis: "partido 3", value: 25},
-        {axis: "partido 2", value: 5},
-        {axis: "partido 1", value: 3}
+        {axis: "Senado", value: 25},
+        {axis: "Camara", value: 5},
+        {axis: "Concejo", value: 3}
+      ],
+      total: 35
+    },{
+      name: "Partido 3",
+      values : [
+        {axis: "Senado", value: 35},
+        {axis: "Camara", value: 3},
+        {axis: "Concejo", value: 6}
       ],
       total: 35
     }];

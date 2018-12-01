@@ -7,6 +7,9 @@ var Concejo = require('../models/Concejo.js');
 var JAL = require('../models/JAL.js');
 
 router.get('/groupedbyparty', function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
     var votes = [];
     getGroupedData(Senado, "Senado", (err, votesS) => {
         votes = votes.concat(votesS)

@@ -11,8 +11,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
 // Point static path to dist
 app.use(express.static(path.join(__dirname, 'dist')));
+
 
 //Loading api routes
 app.use("/api", require('./api/routes'));
@@ -27,7 +29,7 @@ app.get('*', (req, res) => {
 
 mongoose.Promise = require('bluebird');
 mongoose.connect(process.env.va_votacionesdb, { promiseLibrary: require('bluebird') })
-  .then(() =>  console.log('connection succesful'))
+  .then(() => console.log('connection succesful'))
   .catch((err) => console.error(err));
 
 
