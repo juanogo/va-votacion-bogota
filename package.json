@@ -21,6 +21,7 @@
     "@angular/platform-browser": "~7.1.0",
     "@angular/platform-browser-dynamic": "~7.1.0",
     "@angular/router": "~7.1.0",
+    "@clr/angular": "^1.0.0",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "core-js": "^2.5.4",
@@ -31,7 +32,10 @@
     "rxjs": "~6.3.3",
     "serve-favicon": "^2.5.0",
     "tslib": "^1.9.0",
-    "zone.js": "~0.8.26"
+    "zone.js": "~0.8.26",
+    "@clr/ui": "^1.0.0",
+    "@clr/icons": "^1.0.0",
+    "@webcomponents/custom-elements": "^1.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.11.0",
