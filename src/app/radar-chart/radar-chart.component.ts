@@ -114,8 +114,8 @@ export class RadarChartComponent implements AfterContentInit {
     var height = 600;
     var plotxpos = (3 / 8) * width
     var plotypos = (4 / 8) * height
-    var plotwidth = height - 150
-    var plotheight = height - 150
+    var plotwidth = height - 50
+    var plotheight = height - 50
 
     //var color = d3.scaleOrdinal([NQColors.purple, NQColors.red])
 
@@ -125,7 +125,7 @@ export class RadarChartComponent implements AfterContentInit {
       w: plotwidth,
       h: plotheight,
       maxValue: 45,
-      levels: 5,
+      levels: 6,
       roundStrokes: true,
       color: color,
       dotRadius: 4,
@@ -135,8 +135,8 @@ export class RadarChartComponent implements AfterContentInit {
       circlecolor: "ccc",
       valuelabelformat: ".0f",
       valuelabelsize: 14,
-      labelsize: 8,
-      legednames: ['Senado: ' + 300, 'Camara: ' + 400],
+      labelsize: 12,
+      legednames: [],
       legendoptions_legendtitle: "",
       legendoptions_xcorretion: 0,
       legendoptions_legendsize: 16,
@@ -170,10 +170,10 @@ export class RadarChartComponent implements AfterContentInit {
       ypos: 100,
       w: 1200,				     //Width of the circle
       h: 600,				     //Height of the circle
-      levels: 3,				     //How many levels or inner circles should there be drawn
+      levels: 10,				     //How many levels or inner circles should there be drawn
       maxValue: 0, 			     //What is the value that the biggest circle will represent
       labelFactor: 1.25, 	     //How much farther than the radius of the outer circle should the labels be placed
-      opacityArea: 0.35, 	     //The opacity of the area of the blob
+      opacityArea: 0.1, 	     //The opacity of the area of the blob
       dotRadius: 7, 			     //The size of the colored circles of each blog
       opacityCircles: 0.1, 	     //The opacity of the circles of each blob
       circlecolor: "#CDCDCD",     //Base color of circle	 
@@ -239,16 +239,6 @@ export class RadarChartComponent implements AfterContentInit {
     var g = svg.append("g")
       .attr("transform", "translate(" + (cfg.xpos) + "," + (cfg.ypos) + ")");
 
-    /////////////////////////////////////////////////////////
-    ////////// Glow filter for some extra pizzazz ///////////
-    /////////////////////////////////////////////////////////
-
-    //Filter for the outside glow
-    var filter = g.append('defs').append('filter').attr('id', 'glow'),
-      feGaussianBlur = filter.append('feGaussianBlur').attr('stdDeviation', '2.5').attr('result', 'coloredBlur'),
-      feMerge = filter.append('feMerge'),
-      feMergeNode_1 = feMerge.append('feMergeNode').attr('in', 'coloredBlur'),
-      feMergeNode_2 = feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
 
 
     /////////////////////////////////////////////////////////
@@ -267,8 +257,7 @@ export class RadarChartComponent implements AfterContentInit {
       .attr("r", function (d, i) { return radius / cfg.levels * d; })
       .style("fill", cfg.circlecolor)
       .style("stroke", cfg.circlecolor)
-      .style("fill-opacity", cfg.opacityCircles)
-      .style("filter", "url(#glow)");
+      .style("fill-opacity", cfg.opacityCircles);
 
     //Text indicating at what value each level is
     axisGrid.selectAll(".axisLabel")
