@@ -3,7 +3,7 @@
   <app-header></app-header>
 
   <div class="content-container">
-    <clr-vertical-nav>
+    <!--<clr-vertical-nav>
       <a clrVerticalNavLink routerLink="./charmander" routerLinkActive="active">Charmander</a>
       <a clrVerticalNavLink routerLink="./jigglypuff" routerLinkActive="active">Jigglypuff</a>
       <a clrVerticalNavLink routerLink="./pikachu" routerLinkActive="active">Pikachu</a>
@@ -11,9 +11,31 @@
       <a clrVerticalNavLink routerLink="./snorlax" routerLinkActive="active">Snorlax</a>
       <div class="nav-divider"></div>
       <a clrVerticalNavLink routerLink="./credit" routerLinkActive="active">Credit</a>
-    </clr-vertical-nav>
+    </clr-vertical-nav>-->
     <div class="content-area">
-      <app-radar-chart></app-radar-chart>
+      <div class="row">
+        <div class="clr-col-lg-6 clr-col-md-8 clr-col-sm-12">
+          <div class="card">
+            <div class="card-header">
+              Así vota Bogotá
+            </div>
+            <div class="card-block">
+              <p class="card-text">
+                  Las votaciones de Bogotá se encuentran registradas ...
+              </p>
+            </div>
+            <div id="map-container" class="card-img">
+              <app-map [width]="700"></app-map>
+            </div>
+            <div class="card-block">
+              <p class="card-text">
+                Selecciona una localidad en el mapa para actulizar las distintas visualizaciones a la derecha
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </clr-main-container>

@@ -9,13 +9,15 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeLayoutComponent } from './home-layout/home-layout.component';
 import { HeaderComponent } from './home-layout/header/header.component';
 import { RadarChartComponent } from './radar-chart/radar-chart.component';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeLayoutComponent,
     HeaderComponent,
-    RadarChartComponent
+    RadarChartComponent,
+    MapComponent
   ],
   imports: [
     BrowserModule,
