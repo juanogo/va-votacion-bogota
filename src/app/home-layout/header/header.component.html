@@ -6,8 +6,7 @@
       </a>
   </div>
   <div class="header-nav">
-      <a href="..." class="active nav-link"><span class="nav-text">Dashboard</span></a>
-      <a href="..." class="nav-link"><span class="nav-text">Interactive Analytics</span></a>
+      <a *ngFor="let y of years" class="nav-link {{y.active}}" (click)="setCurrentYear(y)"><span class="nav-text">{{y.start}} - {{y.end}}</span></a>
   </div>
   <div class="header-actions">
       <a href="..." class="nav-link nav-icon">

@@ -1,5 +1,4 @@
-<clr-main-container>
-
+<div class="main-container">
   <app-header></app-header>
 
   <div class="content-container">
@@ -13,15 +12,15 @@
       <a clrVerticalNavLink routerLink="./credit" routerLinkActive="active">Credit</a>
     </clr-vertical-nav>-->
     <div class="content-area">
-      <div class="row">
-        <div class="clr-col-lg-6 clr-col-md-8 clr-col-sm-12">
+      <div class="clr-row">
+        <div class="clr-col-md-6 clr-col-sm-12">
           <div class="card">
             <div class="card-header">
               Así vota Bogotá
             </div>
             <div class="card-block">
               <p class="card-text">
-                  Las votaciones de Bogotá se encuentran registradas ...
+                Las votaciones de Bogotá se encuentran registradas ...
               </p>
             </div>
             <div id="map-container" class="card-img">
@@ -34,8 +33,25 @@
             </div>
           </div>
         </div>
-      </div>
 
+        <div class="clr-col-md-6 clr-col-sm-12">
+          <clr-tabs>
+            <clr-tab>
+              <button clrTabLink id="link1">Bar</button>
+              <clr-tab-content id="content1" *clrIfActive>
+                ...
+              </clr-tab-content>
+            </clr-tab>
+            <clr-tab>
+              <button clrTabLink>Radar</button>
+              <clr-tab-content *clrIfActive="true">
+                <app-radar-chart></app-radar-chart>
+              </clr-tab-content>
+            </clr-tab>
+          </clr-tabs>
+        </div>
+
+      </div>
     </div>
   </div>
-</clr-main-container>
+</div>
