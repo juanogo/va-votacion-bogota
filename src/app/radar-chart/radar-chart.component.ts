@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterContentInit } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as d3 from 'd3';
 
 @Component({
@@ -7,65 +8,108 @@ import * as d3 from 'd3';
   styleUrls: ['./radar-chart.component.css']
 })
 export class RadarChartComponent implements AfterContentInit {
-
-  constructor() { }
+  data = [];
+  allAxis = [];
+  years = [2006, 2010, 2014, 2018];
+  zones = [-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  filters = {
+    year: 2006,
+    zone: -1
+  }
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
 
   }
 
+  updateChart() {
+    d3.select("#radar-svg").selectAll("svg").remove();
+    this.data = [];
+    this.allAxis = [];
+    var options = { anio: this.filters.year };
+    if (this.filters.zone !== -1) {
+      options['zona'] = this.filters.zone;
+    }
+
+    this.http.post("api/senado/groupedbyparty", options).subscribe((datav) => {
+      for (var i = 0; i < datav.length; i++) {
+
+        this.updatePartyAxis(datav[i], "Senado");
+      }
+      this.allAxis.push("Senado");
+      this.http.post("api/camara/groupedbyparty", options).subscribe((dataa) => {
+        for (var i = 0; i < dataa.length; i++) {
+
+          this.updatePartyAxis(dataa[i], "Camara");
+        }
+        this.allAxis.push("Camara");
+        options.anio = options.anio + 1;
+        this.http.post("api/alcaldia/groupedbyparty", options).subscribe((dataa) => {
+          for (var i = 0; i < dataa.length; i++) {
+
+            this.updatePartyAxis(dataa[i], "Alcaldia");
+          }
+          this.allAxis.push("Alcaldia");
+          this.http.post("api/concejo/groupedbyparty", options).subscribe((datacon) => {
+            for (var i = 0; i < datacon.length; i++) {
+
+              this.updatePartyAxis(datacon[i], "Concejo");
+            }
+            this.allAxis.push("Concejo");
+            this.http.post("api/jal/groupedbyparty", options).subscribe((datacon) => {
+              for (var i = 0; i < datacon.length; i++) {
+
+                this.updatePartyAxis(datacon[i], "JAL");
+              }
+              this.allAxis.push("JAL");
+              console.log(this.data);
+              this.drawRadar(this.data);
+            })
+          })
+        })
+      })
+    })
+  }
+
   ngAfterContentInit() {
-    var data = [{
-      name: "Partido 1",
-      values : [
-        {axis: "Senado", value: 20},
-        {axis: "Camara", value: 10},
-        {axis: "Concejo", value: 15}
-      ],
-      total: 45
-    },{
-      name: "Partido 2",
-      values : [
-        {axis: "Senado", value: 25},
-        {axis: "Camara", value: 5},
-        {axis: "Concejo", value: 3}
-      ],
-      total: 35
-    },{
-      name: "Partido 3",
-      values : [
-        {axis: "Senado", value: 35},
-        {axis: "Camara", value: 3},
-        {axis: "Concejo", value: 6}
-      ],
-      total: 35
-    }];
+    this.updateChart();
+  }
+
+  updatePartyAxis(party, election) {
+    var p = null;
+    for (var i = 0; i < this.data.length; i++) {
+      if (this.data[i].name === party.partido) {
+        p = this.data[i];
+        break;
+      }
+    }
+
+    if (p === null) {
+      p = {
+        name: party.partido,
+        values: [],
+        total: 0
+      }
+      this.data.push(p);
+    }
+
+    p.values.push(
+      {
+        axis: election,
+        value: party.votos
+      }
+    )
 
 
-    const NQColors = ({
-      brown: "#e66f00",
-      orange: "#F09B0C",
-      yellow: "#C6BD22",
-      dark_purple: "#370F4D",
-      light_purple: "#916FBB",
-      dark_grey: "#6F695D",
-      purple: "#5534BF",
-      light_grey: "#7D859C",
-      red: "#ff3333",
-      steelblue: "#666da3"
-  });
-  
-  const NQTextColors = ({
-      white: "#D7E4DB",
-      orange: "#ffb066",
-      purple: "#9575bd",
-      grey: "#b6bbc8",
-      red: "#ff8080",
-      yellow: "#e1da51"
-  });
+    p.total = p.total + party.votos;
+  }
+
+  drawRadar(data) {
+    data = data.filter((d) => { return d.values.length > 2 });
+
 
     var color = d3.scaleOrdinal(d3.schemeCategory10).domain(data.map(d => d.name))
-    var width = 600;
+    var width = 1200;
     var height = 600;
     var plotxpos = (3 / 8) * width
     var plotypos = (4 / 8) * height
@@ -75,29 +119,29 @@ export class RadarChartComponent implements AfterContentInit {
     //var color = d3.scaleOrdinal([NQColors.purple, NQColors.red])
 
     var radarChartOptions = {
-        xpos: plotxpos,
-        ypos: plotypos,
-        w: plotwidth,
-        h: plotheight,
-        maxValue: 45,
-        levels: 5,
-        roundStrokes: true,
-        color: color,
-        dotRadius: 4,
-        //textColor: NQTextColors.white,
-        textColor: "black",
-        opacityCircles: 0.1,
-        circlecolor: NQColors.light_grey,
-        valuelabelformat: ".0f",
-        valuelabelsize: 14,
-        labelsize: 8,
-        legednames: ['Senado: ' + 300, 'Camara: ' + 400],
-        legendoptions_legendtitle: "",
-        legendoptions_xcorretion: 0,
-        legendoptions_legendsize: 16,
-        legendoptions_ypadbetweenlines: 26,
-        legendoptions_ypadposbetweenpatchandtext: 12,
-        legendoptions_patchsquaresize: 12,
+      xpos: plotxpos,
+      ypos: plotypos,
+      w: plotwidth,
+      h: plotheight,
+      maxValue: 45,
+      levels: 5,
+      roundStrokes: true,
+      color: color,
+      dotRadius: 4,
+      //textColor: NQTextColors.white,
+      textColor: "black",
+      opacityCircles: 0.1,
+      circlecolor: "ccc",
+      valuelabelformat: ".0f",
+      valuelabelsize: 14,
+      labelsize: 8,
+      legednames: ['Senado: ' + 300, 'Camara: ' + 400],
+      legendoptions_legendtitle: "",
+      legendoptions_xcorretion: 0,
+      legendoptions_legendsize: 16,
+      legendoptions_ypadbetweenlines: 26,
+      legendoptions_ypadposbetweenpatchandtext: 12,
+      legendoptions_patchsquaresize: 12,
     };
 
     //Call function to draw the Radar chart
@@ -107,7 +151,6 @@ export class RadarChartComponent implements AfterContentInit {
 
 
   RadarChart(id, data, options) {
-
     /*
     Function RadarChart
     Adapted version from an original version written
@@ -116,15 +159,15 @@ export class RadarChartComponent implements AfterContentInit {
     Used and modified under MIT license.
     */
 
-    var width = 600;
+    var width = 1200;
     var height = 600;
 
-    var svg = d3.select("#radar-svg").append("svg").attr("width", 600).attr("height", 600);
+    var svg = d3.select("#radar-svg").append("svg").attr("width", 1200).attr("height", 600);
 
     var cfg = {
       xpos: 100,
       ypos: 100,
-      w: 600,				     //Width of the circle
+      w: 1200,				     //Width of the circle
       h: 600,				     //Height of the circle
       levels: 3,				     //How many levels or inner circles should there be drawn
       maxValue: 0, 			     //What is the value that the biggest circle will represent
@@ -167,17 +210,13 @@ export class RadarChartComponent implements AfterContentInit {
       })
     }));
 
-    var allAxis = [];
-    d3.map(
-      data[0].values,
-      (d) => { allAxis.push(d.axis) }
-    );	//Names of each axis
-    var total = allAxis.length,					//The number of different axes
+
+    var total = this.allAxis.length,					//The number of different axes
       radius = Math.min(cfg.w / 2, cfg.h / 2), 	//Radius of the outermost circle
       Format = d3.format(cfg.valuelabelformat),		//Formatting for levels texts
       angleSlice = Math.PI * 2 / total;		//The width in radians of each "slice"
 
-    console.log("allaxis", allAxis);
+    console.log("allaxis", this.allAxis);
 
     //Scale for the radius
     //var rScale = d3.scale.linear()
@@ -248,7 +287,7 @@ export class RadarChartComponent implements AfterContentInit {
 
     //Create the straight lines radiating outward from the center
     var axis = axisGrid.selectAll(".axis")
-      .data(allAxis)
+      .data(this.allAxis)
       .enter()
       .append("g")
       .attr("class", "axis");
