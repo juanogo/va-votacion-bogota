@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterContentInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as d3 from 'd3';
+import { ArrayType } from '@angular/compiler';
 
 @Component({
   selector: 'app-radar-chart',
@@ -31,32 +32,32 @@ export class RadarChartComponent implements AfterContentInit {
       options['zona'] = this.filters.zone;
     }
 
-    this.http.post("api/senado/groupedbyparty", options).subscribe((datav) => {
+    this.http.post<[]>("api/senado/groupedbyparty", options).subscribe((datav) => {
       for (var i = 0; i < datav.length; i++) {
 
         this.updatePartyAxis(datav[i], "Senado");
       }
       this.allAxis.push("Senado");
-      this.http.post("api/camara/groupedbyparty", options).subscribe((dataa) => {
+      this.http.post<[]>("api/camara/groupedbyparty", options).subscribe((dataa) => {
         for (var i = 0; i < dataa.length; i++) {
 
           this.updatePartyAxis(dataa[i], "Camara");
         }
         this.allAxis.push("Camara");
         options.anio = options.anio + 1;
-        this.http.post("api/alcaldia/groupedbyparty", options).subscribe((dataa) => {
+        this.http.post<[]>("api/alcaldia/groupedbyparty", options).subscribe((dataa) => {
           for (var i = 0; i < dataa.length; i++) {
 
             this.updatePartyAxis(dataa[i], "Alcaldia");
           }
           this.allAxis.push("Alcaldia");
-          this.http.post("api/concejo/groupedbyparty", options).subscribe((datacon) => {
+          this.http.post<[]>("api/concejo/groupedbyparty", options).subscribe((datacon) => {
             for (var i = 0; i < datacon.length; i++) {
 
               this.updatePartyAxis(datacon[i], "Concejo");
             }
             this.allAxis.push("Concejo");
-            this.http.post("api/jal/groupedbyparty", options).subscribe((datacon) => {
+            this.http.post<[]>("api/jal/groupedbyparty", options).subscribe((datacon) => {
               for (var i = 0; i < datacon.length; i++) {
 
                 this.updatePartyAxis(datacon[i], "JAL");
