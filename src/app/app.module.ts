@@ -10,6 +10,7 @@ import { HomeLayoutComponent } from './home-layout/home-layout.component';
 import { HeaderComponent } from './home-layout/header/header.component';
 import { RadarChartComponent } from './radar-chart/radar-chart.component';
 import { MapComponent } from './map/map.component';
+import { BarchartVotesComponent } from './barchart-votes/barchart-votes.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { MapComponent } from './map/map.component';
     HomeLayoutComponent,
     HeaderComponent,
     RadarChartComponent,
-    MapComponent
+    MapComponent,
+    BarchartVotesComponent
   ],
   imports: [
     BrowserModule,

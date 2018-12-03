@@ -1,16 +1,23 @@
 <header class="header-5">
-  <div class="branding">
-      <a class="nav-link">
-          <clr-icon shape="event"></clr-icon>
-          <span class="title">¿Cómo vota Bogotá?</span>
-      </a>
-  </div>
-  <div class="header-nav">
-      <a *ngFor="let y of years" class="nav-link {{y.active}}" (click)="setCurrentYear(y)"><span class="nav-text">{{y.start}} - {{y.end}}</span></a>
-  </div>
-  <div class="header-actions">
-      <a href="..." class="nav-link nav-icon">
-          <clr-icon shape="cog"></clr-icon>
-      </a>
-  </div>
+    <div class="branding">
+        <a class="nav-link">
+            <clr-icon shape="event"></clr-icon>
+            <span class="title">¿Cómo vota Bogotá?</span>
+        </a>
+    </div>
+    <div class="header-nav">
+        <a *ngFor="let y of years" class="nav-link {{y.active}}" (click)="setCurrentYear(y)"><span class="nav-text">{{y.start}}
+                - {{y.end}}</span></a>
+    </div>
+    <div class="header-actions">
+        <clr-dropdown>
+            <button class="nav-text" clrDropdownTrigger>
+                Votación: {{currentElection.name}}
+                <clr-icon shape="caret down"></clr-icon>
+            </button>
+            <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
+                <a *ngFor="let e of election_types" clrDropdownItem (click)="setElectionType(e)">{{e.name}}</a>
+            </clr-dropdown-menu>
+        </clr-dropdown>
+    </div>
 </header>

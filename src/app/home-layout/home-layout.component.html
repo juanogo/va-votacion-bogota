@@ -1,5 +1,5 @@
 <div class="main-container">
-  <app-header></app-header>
+  <app-header (onSelectYear)="setYear($event)" (onSelectElectionType)="setElectionType($event)"></app-header>
 
   <div class="content-container">
     <!--<clr-vertical-nav>
@@ -38,13 +38,13 @@
           <clr-tabs>
             <clr-tab>
               <button clrTabLink id="link1">Bar</button>
-              <clr-tab-content id="content1" *clrIfActive>
-                ...
+              <clr-tab-content id="content1" *clrIfActive="true">
+                <app-barchart-votes [votation]="selected_type" [year]="selected_year" ></app-barchart-votes>
               </clr-tab-content>
             </clr-tab>
             <clr-tab>
               <button clrTabLink>Radar</button>
-              <clr-tab-content *clrIfActive="true">
+              <clr-tab-content *clrIfActive>
                 <app-radar-chart></app-radar-chart>
               </clr-tab-content>
             </clr-tab>
