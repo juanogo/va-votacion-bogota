@@ -131,13 +131,14 @@ router.get('/zone/:zone', function (req, res, next) {
 })
 
 router.post('/groupedbyparty', function (req, res, next) {
+  console.log(JSON.stringify(req.body));
   Concejo.aggregate([
     {
       $match: req.body
     },
     {
       $group: {
-        _id: '$partido',
+        _id: { zona: '$zona', partido: '$partido', anio: '$anio' },
         votos: { $sum: '$votos' },
       }
     },
@@ -145,7 +146,7 @@ router.post('/groupedbyparty', function (req, res, next) {
     {
       $lookup: {
         from: 'partidos',
-        localField: '_id',
+        localField: '_id.partido',
         foreignField: '_id',
         as: 'partido_n'
       }
@@ -155,8 +156,10 @@ router.post('/groupedbyparty', function (req, res, next) {
       $project: {
         partido: "$partido_n.nombre",
         votos: 1,
-        zona: 1,
-        anio: 1
+        zona: "$_id.zona",
+        anio: "$_id.anio",
+        _id: 0,
+        tipo: "Concejo"
       }
     }
   ], (err, votes) => {
