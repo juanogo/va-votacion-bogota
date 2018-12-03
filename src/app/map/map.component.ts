@@ -221,7 +221,20 @@ export class MapComponent implements AfterContentInit, OnInit {
       .domain([d3.min(this.data_nest, function (d) { return d.value }), d3.max(this.data_nest, function (d) { return d.value })]);
 
     this.svg.selectAll(".tract").transition().duration(750)
-      .style("fill-opacity", 0.4)
+      .style("fill-opacity",
+        (d) => {
+          if (!this._validar_densidad) return 0.4;
+
+          var locali = this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"];
+          var votaciones = 0;
+          this.data_nest.forEach((o, i, a) => {
+            if (locali == o.key)
+              votaciones = o.value;
+          })
+
+          return this.scaleVotes(votaciones);
+
+        })
       .style("fill", (d) => {
         var locali = this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"];
         return this.scaleColors(this.maxvot[locali].partido)
