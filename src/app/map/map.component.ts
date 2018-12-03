@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterContentInit, Input, Output, EventEmitter } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import * as d3 from 'd3';
 
 @Component({
@@ -9,12 +10,31 @@ import * as d3 from 'd3';
 export class MapComponent implements AfterContentInit, OnInit {
   @Input() width;
   @Output() onSelectZone: EventEmitter<any> = new EventEmitter();
+  @Output() onUpdateScaleColors: EventEmitter<any> = new EventEmitter();
 
   localidadesColorScale;
   localidades_barrios;
   mapcodigos;
+  alldata;
+  svg;
+  colores = ["#3A7F53", "#FFE193", "#CC300A", "#112F41", "#FE7F2D", "#BDD3DE", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray"];
+  scaleColors;
+  private _year;
+  private _votation;
 
-  constructor() {
+  @Input() set votation(_v) {
+    this._votation = _v;
+    if (typeof (this._votation !== 'undefined'))
+      this.updateData();
+  };
+
+  @Input() set year(_y: String) {
+    this._year = _y;
+    console.log("set year to barchart");
+    this.updateData();
+  };
+
+  constructor(private http: HttpClient) {
     this.localidades_barrios = {};
     this.mapcodigos = [];
     d3.csv('assets/data/localidades_barriosv2.csv', (o) => {
@@ -39,7 +59,7 @@ export class MapComponent implements AfterContentInit, OnInit {
       .style("opacity", 0);
 
     d3.json("assets/data/bogota_cadastral.json").then((data) => {
-      var svg = d3.select("#net_canvas").attr("width", this.width).attr("height", (+this.width) / 2);
+      this.svg = d3.select("#net_canvas").attr("width", this.width).attr("height", (+this.width) / 2);
       var height = (+this.width) / 2,
         margin = { top: 10, bottom: 20, right: 20, left: 20 };
 
@@ -62,13 +82,13 @@ export class MapComponent implements AfterContentInit, OnInit {
             .fitExtent([[margin.left, margin.top], [this.width - margin.right, height - margin.bottom]], data)
         );
 
-      svg.selectAll("path")
+      this.svg.selectAll("path")
         .data(data.features)
         .enter().append("path")
         .attr("class", "tract")
         .attr("d", path);
 
-      svg.selectAll(".tract")
+      this.svg.selectAll(".tract")
         .style("fill", (d) => {
           return this.localidadesColorScale(this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"]);
         })
@@ -80,7 +100,7 @@ export class MapComponent implements AfterContentInit, OnInit {
           var l = this.localidades_barrios[d.properties.scacodigo];
           this.onSelectZone.emit({ name: l["Localidad"], value: l["Codigo Localidad"] })
         })
-        .on("mouseout", function (d) {
+        .on("mouseout", (d) => {
           div_tooltip.transition()
             .duration(200)
             .style("height", "40px")
@@ -88,5 +108,66 @@ export class MapComponent implements AfterContentInit, OnInit {
         });
 
     });
+  }
+
+  updateData() {
+    var options = {};
+    options['anio'] = this._year + this._votation.plusyear;
+
+    this.http.post<[]>(`api/${this._votation.type}/groupedbyparty`, options).subscribe((data) => {
+      console.log("all data retrieve!");
+      this.alldata = data;
+      this.filtrar();
+    })
+  }
+
+  filtrar() {
+    var maxvot = {};
+
+
+
+    var datos_partidos = {};
+    var partidos = [];
+    var index = 0;
+    for (var i = 0; i < this.alldata.length; i++) {
+      var d = this.alldata[i];
+      //Obtenemos los partidos
+      if (!partidos.includes(d.partido)) {
+        index++;
+        partidos.push(d.partido)
+        datos_partidos[d.partido] = Object.assign({}, d);
+      } else {
+        datos_partidos[d.partido].votos += d.votos;
+      }
+
+      // Rellenamos maxvot
+      if (typeof maxvot[d.zona] !== "undefined") {
+        if (maxvot[d.zona].votos < d.votos) {
+          maxvot[d.zona] = d;
+        }
+      } else {
+        maxvot[d.zona] = d;
+      }
+    };
+
+    partidos.sort((a, b) => {
+      return datos_partidos[b].votos - datos_partidos[a].votos;
+    })
+
+    console.log("maxvot", maxvot);
+    console.log("partidos", partidos);
+    this.scaleColors = d3.scaleOrdinal()
+      .domain(partidos)
+      .range(this.colores);
+
+    this.onUpdateScaleColors.emit(this.scaleColors);
+
+    this.svg.selectAll(".tract").transition().duration(750)
+      .style("fill-opacity", 0.4)
+      .style("fill", (d) => {
+        var locali = this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"];
+        return this.scaleColors(maxvot[locali].partido)
+      });
+
   }
 }

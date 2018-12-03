@@ -10,6 +10,7 @@ export class HomeLayoutComponent implements OnInit, AfterViewInit {
   selected_year = 2006;
   selected_type = {type: "senado", plusyear: 0};
   selected_zone = {name: "Todas", value: -1};
+  scaleColors;
 
   constructor() { }
 
@@ -40,6 +41,12 @@ export class HomeLayoutComponent implements OnInit, AfterViewInit {
     if (this.selected_zone != $event) {
       this.selected_zone = $event;
     }
+  }
+
+  setScaleColors($event) {
+    console.log("fijando escala de colors", $event);
+    this.scaleColors = $event;
+    console.log(typeof(this.scaleColors));
   }
 
   resetZone(){

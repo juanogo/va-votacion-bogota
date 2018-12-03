@@ -24,7 +24,7 @@
               </p>
             </div>
             <div id="map-container" class="card-img">
-              <app-map [width]="700" (onSelectZone)="setZone($event)"></app-map>
+              <app-map (onUpdateScaleColors)="setScaleColors($event)" [width]="700" (onSelectZone)="setZone($event)" [votation]="selected_type" [year]="selected_year"></app-map>
             </div>
             <div class="card-block">
               <p class="card-text">
@@ -45,7 +45,7 @@
             <clr-tab>
               <button clrTabLink id="link1">Bar</button>
               <clr-tab-content id="content1" *clrIfActive="true">
-                <app-barchart-votes [votation]="selected_type" [year]="selected_year" [zone]="selected_zone"></app-barchart-votes>
+                <app-barchart-votes [scaleColors]="scaleColors" [votation]="selected_type" [year]="selected_year" [zone]="selected_zone"></app-barchart-votes>
               </clr-tab-content>
             </clr-tab>
             <clr-tab>

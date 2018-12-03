@@ -12,6 +12,7 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
   private _year;
   private _votation;
   private _zone;
+  private _scaleColors;
 
   @Input() set votation(_v) {
     this._votation = _v;
@@ -29,6 +30,12 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
     console.log("Updating zone to barchart")
     this._zone = _z;
     this.updateData();
+  };
+
+  @Input() set scaleColors (_sc) {
+    console.log("fijando la escala de colores en el barchart", _sc)
+    this._scaleColors = _sc;
+    console.log(typeof(this._scaleColors));
   };
 
   updateData() {
@@ -55,13 +62,7 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
   ngOnInit() {
   }
 
-
   ngAfterContentInit() {
-
-    console.log(this.year);
-    console.log(this.votation);
-    console.log("retrieving all data");
-
   }
 
   filtrar() {
@@ -124,12 +125,9 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
       .domain([d3.min(partidos, d => datos_partidos[d].votos), d3.max(partidos, d => datos_partidos[d].votos)])
       .range([30, width]);
     var altura = 25;
-    var scaleColors = d3.scaleOrdinal()
-      .domain(partidos)
-      .range(escala_colores);
 
     var index = 0;
-    partidos.forEach(function (o, i, a) {
+    partidos.forEach((o, i, a) => {
       datos_partidos[o]["new_index"] = index++;
     })
 
@@ -145,10 +143,10 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
       .attr("height", altura)
       .style("fill-opacity", 0.4)
       .attr("width", d => scaleBars(datos_partidos[d].votos))
-      .attr("y", function (d) {
+      .attr("y", (d) => {
         return (datos_partidos[d].new_index * altura) + 5;
       })
-      .attr("fill", function (d) { return scaleColors(datos_partidos[d].partido); });
+      .attr("fill", (d) => { return this._scaleColors(datos_partidos[d].partido); });
 
 
 
@@ -156,10 +154,10 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
       .transition()
       .duration(750)
       .attr("width", d => scaleBars(datos_partidos[d].votos))
-      .attr("y", function (d) {
+      .attr("y", (d) => {
         return (datos_partidos[d].new_index * altura) + 5;
       })
-      .attr("fill", function (d) { return scaleColors(datos_partidos[d].partido); });
+      .attr("fill", (d) => { return this._scaleColors(datos_partidos[d].partido); });
 
     bars.exit().remove();
 
@@ -176,12 +174,12 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
       .attr("y", function (d) {
         return (datos_partidos[d].new_index * altura) + 25;
       })
-      .text(function (d) { return datos_partidos[d].partido + " (" + datos_partidos[d].votos + " votos)"; });
+      .text((d) => { return datos_partidos[d].partido + " (" + datos_partidos[d].votos + " votos)"; });
 
     texts
       .transition()
       .duration(750)
-      .text(function (d) { return datos_partidos[d].partido + " (" + datos_partidos[d].votos + " votos)"; });
+      .text((d) => { return datos_partidos[d].partido + " (" + datos_partidos[d].votos + " votos)"; });
     texts.exit().remove();
   }
 }
