@@ -22,7 +22,7 @@ export class HomeLayoutComponent implements OnInit, AfterViewInit {
   }
 
   setYear($event) {
-    console.log("Set year to home" + $event);
+    //console.log("Set year to home" + $event);
     if (this.selected_year != $event) {
       this.selected_year = $event;
     }
@@ -30,23 +30,23 @@ export class HomeLayoutComponent implements OnInit, AfterViewInit {
   }
 
   setElectionType($event) {
-    console.log("Set electiontype to home" + $event);
+    //console.log("Set electiontype to home" + $event);
     if (this.selected_type != $event) {
       this.selected_type = $event;
     }
   }
 
   setZone($event) {
-    console.log("Set selectedzone to home" + JSON.stringify($event));
+    //console.log("Set selectedzone to home" + JSON.stringify($event));
     if (this.selected_zone != $event) {
       this.selected_zone = $event;
     }
   }
 
   setScaleColors($event) {
-    console.log("fijando escala de colors", $event);
+    //console.log("fijando escala de colors", $event);
     this.scaleColors = $event;
-    console.log(typeof(this.scaleColors));
+    //console.log(typeof(this.scaleColors));
   }
 
   resetZone(){

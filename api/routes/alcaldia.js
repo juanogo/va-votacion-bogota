@@ -167,4 +167,41 @@ router.post('/groupedbyparty', function (req, res, next) {
   });
 })
 
+
+router.post('/groupedbypartyandzone', function (req, res, next) {
+  Alcaldia.aggregate([
+    {
+      $match: req.body
+    },
+    {
+      $group: {
+        _id: { partido: '$partido', anio: '$anio' },
+        votos: { $sum: '$votos' },
+      }
+    },
+
+    {
+      $lookup: {
+        from: 'partidos',
+        localField: '_id.partido',
+        foreignField: '_id',
+        as: 'partido_n'
+      }
+    }, {
+      $unwind: "$partido_n"
+    }, {
+      $project: {
+        partido: "$partido_n.nombre",
+        votos: 1,
+        anio: "$_id.anio",
+        _id: 0,
+        tipo: "Alcaldia"
+      }
+    }
+  ], (err, votes) => {
+    if (err) next(err);
+    res.json(votes);
+  });
+})
+
 module.exports = router;

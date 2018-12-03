@@ -22,31 +22,31 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
 
   @Input() set year(_y: String) {
     this._year = _y;
-    console.log("set year to barchart");
+    //console.log("set year to barchart");
     this.updateData();
   };
 
   @Input() set zone(_z) {
-    console.log("Updating zone to barchart")
+    //console.log("Updating zone to barchart")
     this._zone = _z;
     this.updateData();
   };
 
   @Input() set scaleColors (_sc) {
-    console.log("fijando la escala de colores en el barchart", _sc)
+    //console.log("fijando la escala de colores en el barchart", _sc)
     this._scaleColors = _sc;
-    console.log(typeof(this._scaleColors));
+    //console.log(typeof(this._scaleColors));
   };
 
   updateData() {
     var options = {};
     options['anio'] = this._year + this._votation.plusyear;
     if (typeof(this._zone) !== 'undefined' && this._zone.value !== -1){
-      console.log("zone --> "+JSON.stringify(this._zone));
+      //console.log("zone --> "+JSON.stringify(this._zone));
       options['zona'] = +this._zone.value;
     } 
     this.http.post<[]>(`api/${this._votation.type}/groupedbyparty`, options).subscribe((data) => {
-      console.log("all data retrieve!");
+      //console.log("all data retrieve!");
       this.alldata = data;
       this.filtrar();
     })
@@ -67,7 +67,7 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
 
   filtrar() {
     var mmvf = this.alldata;
-    console.log(mmvf);
+    //console.log(mmvf);
     var maxvot = {};
 
     mmvf.forEach(function (d) {
@@ -112,8 +112,7 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
 
 
   barchart(data, datos_partidos, partidos) {
-    var escala_colores = ["#3A7F53", "#FFE193", "#CC300A", "#112F41", "#FE7F2D", "#BDD3DE", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray"]
-
+    
     partidos = partidos.sort(function (x, y) {
       return d3.descending(datos_partidos[x].votos, datos_partidos[y].votos);
     });

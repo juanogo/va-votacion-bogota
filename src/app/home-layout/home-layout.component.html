@@ -51,7 +51,7 @@
             <clr-tab>
               <button clrTabLink>Radar</button>
               <clr-tab-content *clrIfActive>
-                <app-radar-chart></app-radar-chart>
+                <app-radar-chart [year]="selected_year" [zone]="selected_zone"></app-radar-chart>
               </clr-tab-content>
             </clr-tab>
           </clr-tabs>

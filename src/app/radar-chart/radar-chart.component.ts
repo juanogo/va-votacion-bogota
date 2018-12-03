@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentInit } from '@angular/core';
+import { Component, OnInit, AfterContentInit, Input } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as d3 from 'd3';
 import { ArrayType } from '@angular/compiler';
@@ -11,59 +11,76 @@ import { ArrayType } from '@angular/compiler';
 export class RadarChartComponent implements AfterContentInit {
   data = [];
   allAxis = [];
-  years = [2006, 2010, 2014, 2018];
-  zones = [-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  filters = {
-    year: 2006,
-    zone: -1
-  }
+  width = 800;
+  private _year;
+  private _zone;
+  g;
+
+  @Input() set year(_y: String) {
+    this._year = _y;
+    //console.log("set year to radarchart");
+    this.updateChart();
+  };
+
+  @Input() set zone(_z) {
+    //console.log("Updating zone to radarchart")
+    this._zone = _z;
+    this.updateChart();
+  };
+
+
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
 
   }
 
+
   updateChart() {
-    d3.select("#radar-svg").selectAll("svg").remove();
+    if (typeof (this._zone) === "undefined") {
+      return;
+    }
+    //d3.select("#radar-svg").selectAll("svg").remove();
     this.data = [];
     this.allAxis = [];
-    var options = { anio: this.filters.year };
-    if (this.filters.zone !== -1) {
-      options['zona'] = this.filters.zone;
-    }
 
-    this.http.post<[]>("api/senado/groupedbyparty", options).subscribe((datav) => {
+    var options = { anio: this._year };
+    if (this._zone.value !== -1) {
+      options['zona'] = +this._zone.value;
+    }
+    //console.log(this._zone, this._year, options);
+    this.http.post<[]>("api/senado/groupedbypartyandzone", options).subscribe((datav) => {
       for (var i = 0; i < datav.length; i++) {
 
         this.updatePartyAxis(datav[i], "Senado");
       }
       this.allAxis.push("Senado");
-      this.http.post<[]>("api/camara/groupedbyparty", options).subscribe((dataa) => {
+      this.http.post<[]>("api/camara/groupedbypartyandzone", options).subscribe((dataa) => {
         for (var i = 0; i < dataa.length; i++) {
 
           this.updatePartyAxis(dataa[i], "Camara");
         }
         this.allAxis.push("Camara");
         options.anio = options.anio + 1;
-        this.http.post<[]>("api/alcaldia/groupedbyparty", options).subscribe((dataa) => {
+        this.http.post<[]>("api/alcaldia/groupedbypartyandzone", options).subscribe((dataa) => {
           for (var i = 0; i < dataa.length; i++) {
 
             this.updatePartyAxis(dataa[i], "Alcaldia");
           }
           this.allAxis.push("Alcaldia");
-          this.http.post<[]>("api/concejo/groupedbyparty", options).subscribe((datacon) => {
+          this.http.post<[]>("api/concejo/groupedbypartyandzone", options).subscribe((datacon) => {
             for (var i = 0; i < datacon.length; i++) {
 
               this.updatePartyAxis(datacon[i], "Concejo");
             }
             this.allAxis.push("Concejo");
-            this.http.post<[]>("api/jal/groupedbyparty", options).subscribe((datacon) => {
+            this.http.post<[]>("api/jal/groupedbypartyandzone", options).subscribe((datacon) => {
               for (var i = 0; i < datacon.length; i++) {
 
                 this.updatePartyAxis(datacon[i], "JAL");
               }
               this.allAxis.push("JAL");
-              console.log(this.data);
+              //console.log(this.data);
               this.drawRadar(this.data);
             })
           })
@@ -73,7 +90,11 @@ export class RadarChartComponent implements AfterContentInit {
   }
 
   ngAfterContentInit() {
-    this.updateChart();
+    //this.updateChart();
+    var svg = d3.select("#radar-svg").append("svg").attr("width", this.width).attr("height", 600);
+    //Append a g element		
+    this.g = svg.append("g")
+      .attr("transform", "translate(100,100)");
   }
 
   updatePartyAxis(party, election) {
@@ -110,12 +131,14 @@ export class RadarChartComponent implements AfterContentInit {
 
 
     var color = d3.scaleOrdinal(d3.schemeCategory10).domain(data.map(d => d.name))
-    var width = 1200;
+    var width = this.width;
     var height = 600;
-    var plotxpos = (3 / 8) * width
-    var plotypos = (4 / 8) * height
+    var plotxpos = (1 / 2) * width
+    var plotypos = (1 / 2) * height
     var plotwidth = height - 50
     var plotheight = height - 50
+
+    this.g.attr("transform", `translate(${plotxpos},${plotypos})`);
 
     //var color = d3.scaleOrdinal([NQColors.purple, NQColors.red])
 
@@ -125,7 +148,7 @@ export class RadarChartComponent implements AfterContentInit {
       w: plotwidth,
       h: plotheight,
       maxValue: 45,
-      levels: 6,
+      levels: 5,
       roundStrokes: true,
       color: color,
       dotRadius: 4,
@@ -146,7 +169,11 @@ export class RadarChartComponent implements AfterContentInit {
     };
 
     //Call function to draw the Radar chart
-    var myplot = this.RadarChart(".radarChart", data, radarChartOptions);
+    this.RadarChart(".radarChart", data, radarChartOptions);
+  }
+
+  drawRadarBase() {
+
   }
 
 
@@ -160,17 +187,15 @@ export class RadarChartComponent implements AfterContentInit {
     Used and modified under MIT license.
     */
 
-    var width = 1200;
+    var width = this.width;
     var height = 600;
-
-    var svg = d3.select("#radar-svg").append("svg").attr("width", 1200).attr("height", 600);
 
     var cfg = {
       xpos: 100,
       ypos: 100,
-      w: 1200,				     //Width of the circle
+      w: this.width,				     //Width of the circle
       h: 600,				     //Height of the circle
-      levels: 10,				     //How many levels or inner circles should there be drawn
+      levels: 5,				     //How many levels or inner circles should there be drawn
       maxValue: 0, 			     //What is the value that the biggest circle will represent
       labelFactor: 1.25, 	     //How much farther than the radius of the outer circle should the labels be placed
       opacityArea: 0.1, 	     //The opacity of the area of the blob
@@ -213,7 +238,7 @@ export class RadarChartComponent implements AfterContentInit {
 
 
     var total = this.allAxis.length,					//The number of different axes
-      radius = Math.min(cfg.w / 2, cfg.h / 2), 	//Radius of the outermost circle
+      radius = Math.min(cfg.w / 2.5, cfg.h / 2.5), 	//Radius of the outermost circle
       Format = d3.format(cfg.valuelabelformat),		//Formatting for levels texts
       angleSlice = Math.PI * 2 / total;		//The width in radians of each "slice"
 
@@ -226,30 +251,14 @@ export class RadarChartComponent implements AfterContentInit {
       .domain([0, maxValue]);
 
     /////////////////////////////////////////////////////////
-    //////////// Create plot group g /////////////
-    /////////////////////////////////////////////////////////
-
-    svg.append("rect")
-      .style("fill", "white")
-      .style("fill-opacity", 1.0)
-      .attr("width", width)
-      .attr("height", height);
-
-    //Append a g element		
-    var g = svg.append("g")
-      .attr("transform", "translate(" + (cfg.xpos) + "," + (cfg.ypos) + ")");
-
-
-
-    /////////////////////////////////////////////////////////
     /////////////// Draw the Circular grid //////////////////
     /////////////////////////////////////////////////////////
 
     //Wrapper for the grid & axes
-    var axisGrid = g.append("g").attr("class", "axisWrapper");
 
     //Draw the background circles
-    axisGrid.selectAll(".levels")
+    console.log(d3.range(1, (cfg.levels + 1)).reverse());
+    this.g.selectAll(".gridCircle")
       .data(d3.range(1, (cfg.levels + 1)).reverse())
       .enter()
       .append("circle")
@@ -259,8 +268,9 @@ export class RadarChartComponent implements AfterContentInit {
       .style("stroke", cfg.circlecolor)
       .style("fill-opacity", cfg.opacityCircles);
 
+
     //Text indicating at what value each level is
-    axisGrid.selectAll(".axisLabel")
+    this.g.selectAll(".axisLabel")
       .data(d3.range(1, (cfg.levels + 1)).reverse())
       .enter().append("text")
       .attr("class", "axisLabel")
@@ -271,14 +281,16 @@ export class RadarChartComponent implements AfterContentInit {
       .style("fill", cfg.textColor)
       .text(function (d, i) { return Format(maxValue * d / cfg.levels); });
 
+    this.g.selectAll(".axisLabel")
+      .data(d3.range(1, (cfg.levels + 1)).reverse()).text(function (d, i) { return Format(maxValue * d / cfg.levels); });
+
     /////////////////////////////////////////////////////////
     //////////////////// Draw the axes //////////////////////
     /////////////////////////////////////////////////////////
 
     //Create the straight lines radiating outward from the center
-    var axis = axisGrid.selectAll(".axis")
-      .data(this.allAxis)
-      .enter()
+    var axis = this.g.selectAll(".axis")
+      .data(this.allAxis).enter()
       .append("g")
       .attr("class", "axis");
     //Append the lines
@@ -302,6 +314,8 @@ export class RadarChartComponent implements AfterContentInit {
       .attr("y", function (d, i) { return rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice * i - Math.PI / 2); })
       .text(function (d) { return d })
 
+
+
     /////////////////////////////////////////////////////////
     ///////////// Draw the radar chart blobs ////////////////
     /////////////////////////////////////////////////////////
@@ -315,35 +329,42 @@ export class RadarChartComponent implements AfterContentInit {
       radarLine.curve(d3.curveCardinalClosed)
     }
 
-    //Create a wrapper for the blobs	
-    var blobWrapper = g.selectAll(".radarWrapper")
-      .data(data)
+    //Create a wrapper for the blobs
+    var blobwrappers = this.g.selectAll(".radarWrapper")
+      .data(data);
+
+    var blobWrapper = blobwrappers
       .enter().append("g")
       .attr("class", "radarWrapper");
 
+    blobwrappers.exit().remove();
+
+
+
     //Append the backgrounds	
-    blobWrapper
-      .append("path")
-      .attr("class", "radarArea")
-      .attr("d", function (d, i) { return radarLine(d.values); })
-      .style("fill", (d) => { return cfg.color(d.name); })
-      .style("fill-opacity", cfg.opacityArea)
-      .on('mouseover', function (d, i) {
-        //Dim all blobs
-        d3.selectAll(".radarArea")
-          .transition().duration(200)
-          .style("fill-opacity", 0.1);
-        //Bring back the hovered over blob
-        d3.select(this)
-          .transition().duration(200)
-          .style("fill-opacity", 0.7);
-      })
-      .on('mouseout', function () {
-        //Bring back all blobs
-        d3.selectAll(".radarArea")
-          .transition().duration(200)
-          .style("fill-opacity", cfg.opacityArea);
-      });
+    /* blobWrapper
+       .append("path")
+       .attr("class", "radarArea")
+       .attr("d", (d, i) => { return radarLine(d.values); })
+       .style("fill", (d) => { return cfg.color(d.name); })
+       .style("fill-opacity", cfg.opacityArea)
+       .on('mouseover', function (d, i) {
+         //Dim all blobs
+         d3.selectAll(".radarArea")
+           .transition().duration(200)
+           .style("fill-opacity", 0.1);
+         //Bring back the hovered over blob
+         d3.select(this)
+           .transition().duration(200)
+           .style("fill-opacity", 0.7);
+       })
+       .on('mouseout', function () {
+         //Bring back all blobs
+         d3.selectAll(".radarArea")
+           .transition().duration(200)
+           .style("fill-opacity", cfg.opacityArea);
+       });
+ */
 
     //Create the outlines	
     blobWrapper.append("path")
@@ -352,6 +373,8 @@ export class RadarChartComponent implements AfterContentInit {
       .style("stroke-width", cfg.strokeWidth + "px")
       .style("stroke", (d) => { return cfg.color(d.name) })
       .style("fill", "none");
+
+
 
     //Append the circles
     blobWrapper.selectAll(".radarCircle")
@@ -363,74 +386,7 @@ export class RadarChartComponent implements AfterContentInit {
       .attr("cy", function (d, i) { return rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2); })
       //.style("fill", function(d,i,j) { return cfg.color(j); }) // this does not work in v4...
       .style("fill", "gray")
-      .style("fill-opacity", 0.8);
-
-
-    ////////////////////////////////////////////
-    /////////// Legend ////////////////
-    ////////////////////////////////////////////
-
-    if (cfg.legednames != null) {
-      var text = svg.append("text")
-        .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
-        .attr("y", cfg.ypos - radius + cfg.legendoptions_ycorretion)
-        .attr("font-size", cfg.legendoptions_legendsize + "px")
-        .attr("fill", cfg.textColor)
-        .text(cfg.legendoptions_legendtitle);
-
-      //Initiate Legend	
-      var legend = svg.append("g")
-        .attr("class", "legend")
-        .attr("height", 100)
-        .attr("width", 200)
-        ;
-      //Create colour squares
-      legend.selectAll('rect')
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
-        .attr("y", function (d, i) { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines; })
-        .attr("width", cfg.legendoptions_patchsquaresize)
-        .attr("height", cfg.legendoptions_patchsquaresize)
-        .style("fill", (d) => { return cfg.color(d.name); })
-        ;
-      //Create text next to squares
-      legend.selectAll('text')
-        .data(data)
-        .enter()
-        .append("text")
-        .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion + cfg.legendoptions_xpadafterpatch)
-        .attr("y", (d, i) => { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines + cfg.legendoptions_ypadposbetweenpatchandtext })
-        .attr("font-size", cfg.legendoptions_legendsize + "px")
-        .attr("fill", cfg.textColor)
-        .text(function (d) { return d.name + ": " + d.total; })
-        ;
-    }//legendnames
-
-
-
-    /////////////////////////////////////////////////////////
-    //////// Append invisible circles for tooltip ///////////
-    /////////////////////////////////////////////////////////
-
-    //Wrapper for the invisible circles on top
-    var blobCircleWrapper = g.selectAll(".radarCircleWrapper")
-      .data(data)
-      .enter().append("g")
-      .attr("class", "radarCircleWrapper");
-
-    //Append a set of invisible circles on top for the mouseover pop-up
-    blobCircleWrapper.selectAll(".radarInvisibleCircle")
-      .data(function (d, i) { return d.values; })
-      .enter().append("circle")
-      .attr("class", "radarInvisibleCircle")
-      .attr("r", cfg.dotRadius * 1.5)
-      .attr("cx", function (d, i) { return rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2); })
-      .attr("cy", function (d, i) { return rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2); })
-      .style("fill", "none")
-      .style("pointer-events", "all")
-
+      .style("fill-opacity", 0.8)
       .on("mouseover", function (d, i) {
         let newX = parseFloat(d3.select(this).attr('cx')) - 10;
         let newY = parseFloat(d3.select(this).attr('cy')) - 10;
@@ -447,16 +403,97 @@ export class RadarChartComponent implements AfterContentInit {
           .style("opacity", 0);
       });
 
+    blobwrappers.select(".radarStroke").transition().duration(750)
+      .attr("d", function (d, i) { return radarLine(d.values); })
+      .style("stroke-width", cfg.strokeWidth + "px")
+      .style("stroke", (d) => { return cfg.color(d.name) })
+      .style("fill", "none");
+
+    blobwrappers.select(".radarArea")
+      .transition()
+      .duration(750)
+      .attr("d", (d, i) => { return radarLine(d.values); })
+      .style("fill", (d) => { return cfg.color(d.name); });
+
+    blobwrappers.selectAll(".radarCircle")
+      .data(function (d, i) { return d.values; })
+      .transition()
+      .duration(500)
+      .attr("cx", function (d, i) { return rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2); })
+      .attr("cy", function (d, i) { return rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2); });
+
+    blobwrappers.selectAll(".radarCircle")
+      .data(function (d, i) { return d.values; })
+      .exit().remove();
+
+
+    ////////////////////////////////////////////
+    /////////// Legend ////////////////
+    ////////////////////////////////////////////
+    /*
+        if (cfg.legednames != null) {
+          var text = this.svg.append("text")
+            .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
+            .attr("y", cfg.ypos - radius + cfg.legendoptions_ycorretion)
+            .attr("font-size", cfg.legendoptions_legendsize + "px")
+            .attr("fill", cfg.textColor)
+            .text(cfg.legendoptions_legendtitle);
+    
+          //Initiate Legend	
+          var legend = this.svg.append("g")
+            .attr("class", "legend")
+            .attr("height", 100)
+            .attr("width", 200)
+            ;
+          //Create colour squares
+          legend.selectAll('rect')
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
+            .attr("y", function (d, i) { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines; })
+            .attr("width", cfg.legendoptions_patchsquaresize)
+            .attr("height", cfg.legendoptions_patchsquaresize)
+            .style("fill", (d) => { return cfg.color(d.name); })
+            ;
+          //Create text next to squares
+          legend.selectAll('text')
+            .data(data)
+            .enter()
+            .append("text")
+            .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion + cfg.legendoptions_xpadafterpatch)
+            .attr("y", (d, i) => { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines + cfg.legendoptions_ypadposbetweenpatchandtext })
+            .attr("font-size", cfg.legendoptions_legendsize + "px")
+            .attr("fill", cfg.textColor)
+            .text(function (d) { return d.name + ": " + d.total; })
+            ;
+        }//legendnames
+    */
+
+
+    /////////////////////////////////////////////////////////
+    //////// Append invisible circles for tooltip ///////////
+    /////////////////////////////////////////////////////////
+
+    //Wrapper for the invisible circles on top
+    var blobCircleWrapper = this.g.selectAll(".radarCircleWrapper")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "radarCircleWrapper");
+
+
+
+
+
 
     //Set up the small tooltip for when you hover over a circle
-    var tooltip = g.append("text")
+    var tooltip = this.g.append("text")
       .style("fill", cfg.textColor)
       .attr("class", "tooltip")
       .style("opacity", 0);
 
     //*/
 
-    return svg
   }//RadarChart
 }
 

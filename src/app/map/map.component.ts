@@ -30,7 +30,7 @@ export class MapComponent implements AfterContentInit, OnInit {
 
   @Input() set year(_y: String) {
     this._year = _y;
-    console.log("set year to barchart");
+    //console.log("set year to barchart");
     this.updateData();
   };
 
@@ -96,7 +96,7 @@ export class MapComponent implements AfterContentInit, OnInit {
         .style("stroke-width", 0.1)
         .style("stroke", "gray")
         .on("click", (d) => {
-          console.log("EVENTO A CAPTURAR CODIGO LOCALIDAD:", this.localidades_barrios[d.properties.scacodigo])
+          //console.log("EVENTO A CAPTURAR CODIGO LOCALIDAD:", this.localidades_barrios[d.properties.scacodigo])
           var l = this.localidades_barrios[d.properties.scacodigo];
           this.onSelectZone.emit({ name: l["Localidad"], value: l["Codigo Localidad"] })
         })
@@ -115,7 +115,7 @@ export class MapComponent implements AfterContentInit, OnInit {
     options['anio'] = this._year + this._votation.plusyear;
 
     this.http.post<[]>(`api/${this._votation.type}/groupedbyparty`, options).subscribe((data) => {
-      console.log("all data retrieve!");
+      //console.log("all data retrieve!");
       this.alldata = data;
       this.filtrar();
     })
@@ -154,8 +154,8 @@ export class MapComponent implements AfterContentInit, OnInit {
       return datos_partidos[b].votos - datos_partidos[a].votos;
     })
 
-    console.log("maxvot", maxvot);
-    console.log("partidos", partidos);
+    //console.log("maxvot", maxvot);
+    //console.log("partidos", partidos);
     this.scaleColors = d3.scaleOrdinal()
       .domain(partidos)
       .range(this.colores);
