@@ -1,7 +1,6 @@
 import { Component, OnInit, AfterContentInit, Input } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as d3 from 'd3';
-import { type } from 'os';
 
 @Component({
   selector: 'app-barchart-votes',
