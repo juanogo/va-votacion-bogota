@@ -1,7 +1,6 @@
 import { Component, OnInit, AfterContentInit, Input } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as d3 from 'd3';
-import { ArrayType } from '@angular/compiler';
 
 @Component({
   selector: 'app-radar-chart',
@@ -202,7 +201,7 @@ export class RadarChartComponent implements AfterContentInit {
       dotRadius: 7, 			     //The size of the colored circles of each blog
       opacityCircles: 0.1, 	     //The opacity of the circles of each blob
       circlecolor: "#CDCDCD",     //Base color of circle	 
-      strokeWidth: 2, 		     //The width of the stroke around each blob
+      strokeWidth: 1.5, 		     //The width of the stroke around each blob
       roundStrokes: false,	     //If true the area and stroke will follow a round path (cardinal-closed)
       textColor: "red",	     // Default color of texts
       valuelabelformat: ".2f",    // Default formatting of level values
@@ -242,7 +241,6 @@ export class RadarChartComponent implements AfterContentInit {
       Format = d3.format(cfg.valuelabelformat),		//Formatting for levels texts
       angleSlice = Math.PI * 2 / total;		//The width in radians of each "slice"
 
-    console.log("allaxis", this.allAxis);
 
     //Scale for the radius
     //var rScale = d3.scale.linear()
@@ -372,7 +370,31 @@ export class RadarChartComponent implements AfterContentInit {
       .attr("d", function (d, i) { return radarLine(d.values); })
       .style("stroke-width", cfg.strokeWidth + "px")
       .style("stroke", (d) => { return cfg.color(d.name) })
-      .style("fill", "none");
+      .style("fill", "none")
+      .on("mouseover", function (d, i) {
+        partyTooltip
+          .transition()
+          .duration(750)
+          .style('opacity', 1);
+
+        partyTooltip.select(".party-tooltip")
+          .text(d.name);
+
+
+        d3.selectAll(".radarStroke")
+          .style("stroke-width", "0.5px")
+          .style("stroke", "gray");
+        d3.select(this).style("stroke-width", "5px")
+          .style("stroke", (d) => { return cfg.color(d.name) });
+      }).on("mouseout", function (d, i) {
+        d3.selectAll(".radarStroke")
+          .style("stroke-width", cfg.strokeWidth + "px")
+          .style("stroke", (d) => { return cfg.color(d.name) });
+        partyTooltip
+          .transition()
+          .duration(190)
+          .style('opacity', 0);
+      })
 
 
 
@@ -491,6 +513,23 @@ export class RadarChartComponent implements AfterContentInit {
       .style("fill", cfg.textColor)
       .attr("class", "tooltip")
       .style("opacity", 0);
+
+    var partyTooltip = this.g.append("g")
+      .attr("transform", "translate(-350, -200)")
+      .style("opacity", 0);
+      
+    partyTooltip.append("rect").attr("width", 280).attr("height", 40)
+      .style("fill", "black")
+      .attr("rx", 20)
+      .attr("ry", 20)
+      .style("opacity", 0.5);
+
+    partyTooltip.append("text")
+      .style("fill", "white")
+      .attr("x", 10)
+      .attr("y", 25)
+      .attr("class", "party-tooltip")
+      .text("prueba de tooltip");
 
     //*/
 
