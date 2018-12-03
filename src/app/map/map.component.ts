@@ -17,10 +17,13 @@ export class MapComponent implements AfterContentInit, OnInit {
   mapcodigos;
   alldata;
   svg;
+  mapgroup;
   colores = ["#3A7F53", "#FFE193", "#CC300A", "#112F41", "#FE7F2D", "#BDD3DE", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray"];
   scaleColors;
   private _year;
   private _votation;
+
+  maxvot = {};
 
   @Input() set votation(_v) {
     this._votation = _v;
@@ -54,12 +57,31 @@ export class MapComponent implements AfterContentInit, OnInit {
   }
 
   ngAfterContentInit() {
-    var div_tooltip = d3.select("body").append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
+
 
     d3.json("assets/data/bogota_cadastral.json").then((data) => {
       this.svg = d3.select("#net_canvas").attr("width", this.width).attr("height", (+this.width) / 2);
+      this.mapgroup = this.svg.append("g").attr("transform", "translate(0, 0)");
+
+      var tooltip = this.svg.append("g")
+        .attr("transform", "translate(0, 10)")
+        .style("opacity", 0);
+
+      tooltip.append("rect").attr("width", 280).attr("height", 40)
+        .style("fill", "black")
+        .attr("rx", 20)
+        .attr("ry", 20)
+        .style("opacity", 0.5);
+
+      tooltip.append("text")
+        .style("fill", "white")
+        .attr("x", 10)
+        .attr("y", 25)
+        .attr("class", "ltooltip")
+        .text("prueba de tooltip");
+
+
+
       var height = (+this.width) / 2,
         margin = { top: 10, bottom: 20, right: 20, left: 20 };
 
@@ -82,13 +104,13 @@ export class MapComponent implements AfterContentInit, OnInit {
             .fitExtent([[margin.left, margin.top], [this.width - margin.right, height - margin.bottom]], data)
         );
 
-      this.svg.selectAll("path")
+      this.mapgroup.selectAll("path")
         .data(data.features)
         .enter().append("path")
-        .attr("class", "tract")
+        .attr("class", (d) => { return "tract l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"]; })
         .attr("d", path);
 
-      this.svg.selectAll(".tract")
+      this.mapgroup.selectAll(".tract")
         .style("fill", (d) => {
           return this.localidadesColorScale(this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"]);
         })
@@ -101,13 +123,30 @@ export class MapComponent implements AfterContentInit, OnInit {
           this.onSelectZone.emit({ name: l["Localidad"], value: l["Codigo Localidad"] })
         })
         .on("mouseout", (d) => {
-          div_tooltip.transition()
-            .duration(200)
-            .style("height", "40px")
-            .style("opacity", 0);
-        });
+          var locali = this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"];
+
+          this.mapgroup.selectAll(".l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
+            .style("fill", this.scaleColors(this.maxvot[locali].partido));
+          
+          tooltip.transition().duration(100).style("opacity", 0);
+          /*
+                    div_tooltip.transition()
+                      .duration(200)
+                      .style("height", "40px")
+                      .style("opacity", 0);
+          */
+        })
+        .on("mouseover", (d) => {
+          tooltip.transition().duration(100).style("opacity", 1);
+          tooltip.select(".ltooltip").text(this.localidades_barrios[d.properties.scacodigo]["Localidad"])
+          this.mapgroup.selectAll(".l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
+            .style("fill", "FF9800");
+        })
 
     });
+
+
+
   }
 
   updateData() {
@@ -122,10 +161,7 @@ export class MapComponent implements AfterContentInit, OnInit {
   }
 
   filtrar() {
-    var maxvot = {};
-
-
-
+    this.maxvot = {};
     var datos_partidos = {};
     var partidos = [];
     var index = 0;
@@ -141,12 +177,12 @@ export class MapComponent implements AfterContentInit, OnInit {
       }
 
       // Rellenamos maxvot
-      if (typeof maxvot[d.zona] !== "undefined") {
-        if (maxvot[d.zona].votos < d.votos) {
-          maxvot[d.zona] = d;
+      if (typeof this.maxvot[d.zona] !== "undefined") {
+        if (this.maxvot[d.zona].votos < d.votos) {
+          this.maxvot[d.zona] = d;
         }
       } else {
-        maxvot[d.zona] = d;
+        this.maxvot[d.zona] = d;
       }
     };
 
@@ -166,7 +202,7 @@ export class MapComponent implements AfterContentInit, OnInit {
       .style("fill-opacity", 0.4)
       .style("fill", (d) => {
         var locali = this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"];
-        return this.scaleColors(maxvot[locali].partido)
+        return this.scaleColors(this.maxvot[locali].partido)
       });
 
   }
