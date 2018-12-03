@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentInit, Input } from '@angular/core';
+import { Component, OnInit, AfterContentInit, Input, Output, EventEmitter } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -8,6 +8,7 @@ import * as d3 from 'd3';
 })
 export class MapComponent implements AfterContentInit, OnInit {
   @Input() width;
+  @Output() onSelectZone: EventEmitter<any> = new EventEmitter();
 
   localidadesColorScale;
   localidades_barrios;
@@ -75,7 +76,9 @@ export class MapComponent implements AfterContentInit, OnInit {
         .style("stroke-width", 0.1)
         .style("stroke", "gray")
         .on("click", (d) => {
-          console.log("EVENTO A CAPTURAR CODIGO LOCALIDAD:", this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
+          console.log("EVENTO A CAPTURAR CODIGO LOCALIDAD:", this.localidades_barrios[d.properties.scacodigo])
+          var l = this.localidades_barrios[d.properties.scacodigo];
+          this.onSelectZone.emit({ name: l["Localidad"], value: l["Codigo Localidad"] })
         })
         .on("mouseout", function (d) {
           div_tooltip.transition()

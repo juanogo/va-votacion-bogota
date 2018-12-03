@@ -13,7 +13,7 @@
     </clr-vertical-nav>-->
     <div class="content-area">
       <div class="clr-row">
-        <div class="clr-col-md-6 clr-col-sm-12">
+        <div class="clr-col-xl-6 clr-col-lg-8 clr-col-md-12 clr-col-sm-12">
           <div class="card">
             <div class="card-header">
               Así vota Bogotá
@@ -24,22 +24,28 @@
               </p>
             </div>
             <div id="map-container" class="card-img">
-              <app-map [width]="700"></app-map>
+              <app-map [width]="700" (onSelectZone)="setZone($event)"></app-map>
             </div>
             <div class="card-block">
               <p class="card-text">
                 Selecciona una localidad en el mapa para actulizar las distintas visualizaciones a la derecha
               </p>
             </div>
+            <div class="card-footer">
+              <button class="btn btn-sm btn-link" (click)="resetZone()">
+                  <clr-icon shape="trash"></clr-icon>
+                Localidad Seleccionada: {{selected_zone.name}}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="clr-col-md-6 clr-col-sm-12">
+        <div class="clr-col-xl-6 clr-col-md-12 clr-col-lg-4 clr-col-sm-12">
           <clr-tabs>
             <clr-tab>
               <button clrTabLink id="link1">Bar</button>
               <clr-tab-content id="content1" *clrIfActive="true">
-                <app-barchart-votes [votation]="selected_type" [year]="selected_year" ></app-barchart-votes>
+                <app-barchart-votes [votation]="selected_type" [year]="selected_year" [zone]="selected_zone"></app-barchart-votes>
               </clr-tab-content>
             </clr-tab>
             <clr-tab>

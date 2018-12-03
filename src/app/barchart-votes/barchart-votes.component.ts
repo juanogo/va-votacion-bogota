@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterContentInit, Input } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as d3 from 'd3';
+import { type } from 'os';
 
 @Component({
   selector: 'app-barchart-votes',
@@ -11,22 +12,34 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
 
   private _year;
   private _votation;
+  private _zone;
 
   @Input() set votation(_v) {
     this._votation = _v;
     if (typeof (this._votation !== 'undefined'))
-    this.updateData();
+      this.updateData();
   };
 
   @Input() set year(_y: String) {
     this._year = _y;
     console.log("set year to barchart");
-    
-      this.updateData();
+    this.updateData();
+  };
+
+  @Input() set zone(_z) {
+    console.log("Updating zone to barchart")
+    this._zone = _z;
+    this.updateData();
   };
 
   updateData() {
-    this.http.post<[]>(`api/${this._votation.type}/groupedbyparty`, { anio: this._year + this._votation.plusyear }).subscribe((data) => {
+    var options = {};
+    options['anio'] = this._year + this._votation.plusyear;
+    if (typeof(this._zone) !== 'undefined' && this._zone.value !== -1){
+      console.log("zone --> "+JSON.stringify(this._zone));
+      options['zona'] = +this._zone.value;
+    } 
+    this.http.post<[]>(`api/${this._votation.type}/groupedbyparty`, options).subscribe((data) => {
       console.log("all data retrieve!");
       this.alldata = data;
       this.filtrar();

@@ -9,6 +9,7 @@ export class HomeLayoutComponent implements OnInit, AfterViewInit {
 
   selected_year = 2006;
   selected_type = {type: "senado", plusyear: 0};
+  selected_zone = {name: "Todas", value: -1};
 
   constructor() { }
 
@@ -32,6 +33,16 @@ export class HomeLayoutComponent implements OnInit, AfterViewInit {
     if (this.selected_type != $event) {
       this.selected_type = $event;
     }
+  }
 
+  setZone($event) {
+    console.log("Set selectedzone to home" + JSON.stringify($event));
+    if (this.selected_zone != $event) {
+      this.selected_zone = $event;
+    }
+  }
+
+  resetZone(){
+    this.selected_zone = {name: "Todas", value: -1};
   }
 }
