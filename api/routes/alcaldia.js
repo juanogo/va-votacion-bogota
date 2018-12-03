@@ -169,6 +169,11 @@ router.post('/groupedbyparty', function (req, res, next) {
 
 
 router.post('/groupedbypartyandzone', function (req, res, next) {
+  var limit = 50;
+  if (typeof (req.body.limit) !== "undefined") {
+    limit = req.body.limit;
+    req.body.limit = undefined;
+  }
   Alcaldia.aggregate([
     {
       $match: req.body
@@ -195,9 +200,11 @@ router.post('/groupedbypartyandzone', function (req, res, next) {
         votos: 1,
         anio: "$_id.anio",
         _id: 0,
-        tipo: "Alcaldia"
+        tipo: "Senado"
       }
-    }
+    },
+    { $sort: { votos: -1 } },
+    { $limit: limit }
   ], (err, votes) => {
     if (err) next(err);
     res.json(votes);

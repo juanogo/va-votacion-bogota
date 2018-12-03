@@ -87,43 +87,42 @@ router.get('/year/:year', function (req, res, next) {
 })
 
 router.get('/zone/:zone', function (req, res, next) {
+  var limit = 50;
+  if (typeof (req.body.limit) !== "undefined") {
+    limit = req.body.limit;
+    req.body.limit = undefined;
+  }
   Camara.aggregate([
     {
-      $match: {
-        zona: Number(req.params.zone)
-      }
+      $match: req.body
     },
     {
-      $lookup: {
-        from: 'candidatos',
-        localField: 'candidato',
-        foreignField: '_id',
-        as: 'candidato_n'
+      $group: {
+        _id: { partido: '$partido', anio: '$anio' },
+        votos: { $sum: '$votos' },
       }
-    }, {
-      $unwind: "$candidato_n"
     },
+
     {
       $lookup: {
         from: 'partidos',
-        localField: 'partido',
+        localField: '_id.partido',
         foreignField: '_id',
         as: 'partido_n'
       }
     }, {
       $unwind: "$partido_n"
-    }
-    , {
+    }, {
       $project: {
-        candidato: "$candidato_n.nombre",
         partido: "$partido_n.nombre",
-        _id: 1,
-        zona: 1,
-        circunscripcion: 1,
-        anio: 1,
-        votos: 1
+        votos: 1,
+        anio: "$_id.anio",
+        _id: 0,
+        tipo: "Senado"
       }
-    }
+    },
+    { $sort: { votos: -1 } },
+    { $limit: limit }
   ], (err, votes) => {
     if (err) next(err);
     res.json(votes);
@@ -168,6 +167,8 @@ router.post('/groupedbyparty', function (req, res, next) {
 })
 
 router.post('/groupedbypartyandzone', function (req, res, next) {
+  var limit = req.body.limit;
+  req.body.limit = undefined;
   Camara.aggregate([
     {
       $match: req.body
@@ -194,9 +195,11 @@ router.post('/groupedbypartyandzone', function (req, res, next) {
         votos: 1,
         anio: "$_id.anio",
         _id: 0,
-        tipo: "Camara"
+        tipo: "Senado"
       }
-    }
+    },
+    { $sort: { votos: -1 } },
+    { $limit: limit }
   ], (err, votes) => {
     if (err) next(err);
     res.json(votes);

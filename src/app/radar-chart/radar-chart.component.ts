@@ -43,7 +43,7 @@ export class RadarChartComponent implements AfterContentInit {
     this.data = [];
     this.allAxis = [];
 
-    var options = { anio: this._year };
+    var options = { anio: this._year, limit: 15 };
     if (this._zone.value !== -1) {
       options['zona'] = +this._zone.value;
     }
