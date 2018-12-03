@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Senado = require('../models/Senado.js');
-
+var type = "Senado";
 /* GET home page. */
 router.get('/', function (req, res, next) {
   Senado.aggregate([
@@ -158,7 +158,7 @@ router.post('/groupedbyparty', function (req, res, next) {
         zona: "$_id.zona",
         anio: "$_id.anio",
         _id: 0,
-        tipo: "Senado"
+        tipo: type
       }
     }
   ], (err, votes) => {

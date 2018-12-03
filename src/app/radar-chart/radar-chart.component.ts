@@ -8,12 +8,24 @@ import * as d3 from 'd3';
   styleUrls: ['./radar-chart.component.css']
 })
 export class RadarChartComponent implements AfterContentInit {
-  data = [];
-  allAxis = [];
+  databyparty = [];
+  databyelection = [];
+  allElectionTypes = [];
+  allPartyNames = [];
   width = 800;
   private _year;
   private _zone;
+  private _selected_axis = "party";
   g;
+
+  set selected_axis(_sa) {
+    this._selected_axis = _sa;
+    this.drawRadar();
+  }
+
+  get selected_axis() {
+    return this._selected_axis;
+  }
 
   @Input() set year(_y: String) {
     this._year = _y;
@@ -40,47 +52,69 @@ export class RadarChartComponent implements AfterContentInit {
       return;
     }
     //d3.select("#radar-svg").selectAll("svg").remove();
-    this.data = [];
-    this.allAxis = [];
-
-    var options = { anio: this._year, limit: 15 };
+    this.databyparty = [];
+    this.allElectionTypes = [];
+    this.databyelection = [];
+    this.allPartyNames = [];
+    var options = { anio: this._year, limit: 10 };
     if (this._zone.value !== -1) {
       options['zona'] = +this._zone.value;
     }
     //console.log(this._zone, this._year, options);
     this.http.post<[]>("api/senado/groupedbypartyandzone", options).subscribe((datav) => {
+      this.databyelection = this.databyelection.concat(datav);
       for (var i = 0; i < datav.length; i++) {
-
         this.updatePartyAxis(datav[i], "Senado");
       }
-      this.allAxis.push("Senado");
+      this.allElectionTypes.push("Senado");
       this.http.post<[]>("api/camara/groupedbypartyandzone", options).subscribe((dataa) => {
+        this.databyelection = this.databyelection.concat(dataa);
         for (var i = 0; i < dataa.length; i++) {
 
           this.updatePartyAxis(dataa[i], "Camara");
         }
-        this.allAxis.push("Camara");
+        this.allElectionTypes.push("Camara");
         options.anio = options.anio + 1;
         this.http.post<[]>("api/alcaldia/groupedbypartyandzone", options).subscribe((dataa) => {
+          this.databyelection = this.databyelection.concat(dataa);
           for (var i = 0; i < dataa.length; i++) {
 
             this.updatePartyAxis(dataa[i], "Alcaldia");
           }
-          this.allAxis.push("Alcaldia");
+          this.allElectionTypes.push("Alcaldia");
           this.http.post<[]>("api/concejo/groupedbypartyandzone", options).subscribe((datacon) => {
+            this.databyelection = this.databyelection.concat(datacon);
             for (var i = 0; i < datacon.length; i++) {
 
               this.updatePartyAxis(datacon[i], "Concejo");
             }
-            this.allAxis.push("Concejo");
+            this.allElectionTypes.push("Concejo");
             this.http.post<[]>("api/jal/groupedbypartyandzone", options).subscribe((datacon) => {
+              this.databyelection = this.databyelection.concat(datacon);
               for (var i = 0; i < datacon.length; i++) {
 
                 this.updatePartyAxis(datacon[i], "JAL");
               }
-              this.allAxis.push("JAL");
-              //console.log(this.data);
-              this.drawRadar(this.data);
+
+              this.allElectionTypes.push("JAL");
+
+              //console.log(this.databyelection);
+              this.allPartyNames = [];
+              this.databyelection = this.databyelection.map((d) => {
+                if (!this.allPartyNames.includes(d.partido)) {
+                  this.allPartyNames.push(d.partido);
+                }
+                return { axis: d.partido, value: d.votos, tipo: d.tipo }
+              });
+              this.databyelection = d3.nest()
+                .key(function (d) { return d.tipo; })
+                .entries(this.databyelection);
+              this.databyelection = this.databyelection.map((d) => { return { name: d.key, values: d.values } })
+
+              this.databyparty = this.databyparty.filter((d) => { return d.values.length > 2 });
+
+              //console.log(this.databyelection);
+              this.drawRadar();
             })
           })
         })
@@ -98,9 +132,9 @@ export class RadarChartComponent implements AfterContentInit {
 
   updatePartyAxis(party, election) {
     var p = null;
-    for (var i = 0; i < this.data.length; i++) {
-      if (this.data[i].name === party.partido) {
-        p = this.data[i];
+    for (var i = 0; i < this.databyparty.length; i++) {
+      if (this.databyparty[i].name === party.partido) {
+        p = this.databyparty[i];
         break;
       }
     }
@@ -111,7 +145,7 @@ export class RadarChartComponent implements AfterContentInit {
         values: [],
         total: 0
       }
-      this.data.push(p);
+      this.databyparty.push(p);
     }
 
     p.values.push(
@@ -125,9 +159,17 @@ export class RadarChartComponent implements AfterContentInit {
     p.total = p.total + party.votos;
   }
 
-  drawRadar(data) {
-    data = data.filter((d) => { return d.values.length > 2 });
+  drawRadar() {
+    //data = data.filter((d) => { return d.values.length > 2 });
 
+    var data = this.databyelection;
+    var allAxis = this.allPartyNames;
+    if (this.selected_axis !== "party") {
+      data = this.databyparty;
+      allAxis = this.allElectionTypes;
+    }
+
+    console.log("all axis", allAxis);
 
     var color = d3.scaleOrdinal(d3.schemeCategory10).domain(data.map(d => d.name))
     var width = this.width;
@@ -168,16 +210,14 @@ export class RadarChartComponent implements AfterContentInit {
     };
 
     //Call function to draw the Radar chart
-    this.RadarChart(".radarChart", data, radarChartOptions);
-  }
-
-  drawRadarBase() {
-
+    this.RadarChart(".radarChart", data, allAxis, radarChartOptions);
   }
 
 
 
-  RadarChart(id, data, options) {
+
+  RadarChart(id, data, allAxis, options) {
+    //console.log("data en radar", data);
     /*
     Function RadarChart
     Adapted version from an original version written
@@ -236,11 +276,12 @@ export class RadarChartComponent implements AfterContentInit {
     }));
 
 
-    var total = this.allAxis.length,					//The number of different axes
+    var total = allAxis.length,					//The number of different axes
       radius = Math.min(cfg.w / 2.5, cfg.h / 2.5), 	//Radius of the outermost circle
       Format = d3.format(cfg.valuelabelformat),		//Formatting for levels texts
       angleSlice = Math.PI * 2 / total;		//The width in radians of each "slice"
 
+    console.log("angle slice", angleSlice);
 
     //Scale for the radius
     //var rScale = d3.scale.linear()
@@ -255,7 +296,7 @@ export class RadarChartComponent implements AfterContentInit {
     //Wrapper for the grid & axes
 
     //Draw the background circles
-    console.log(d3.range(1, (cfg.levels + 1)).reverse());
+    //console.log(d3.range(1, (cfg.levels + 1)).reverse());
     this.g.selectAll(".gridCircle")
       .data(d3.range(1, (cfg.levels + 1)).reverse())
       .enter()
@@ -279,23 +320,28 @@ export class RadarChartComponent implements AfterContentInit {
       .style("fill", cfg.textColor)
       .text(function (d, i) { return Format(maxValue * d / cfg.levels); });
 
-    this.g.selectAll(".axisLabel")
-      .data(d3.range(1, (cfg.levels + 1)).reverse()).text(function (d, i) { return Format(maxValue * d / cfg.levels); });
+    var axislabels = this.g.selectAll(".axisLabel")
+      .data(d3.range(1, (cfg.levels + 1)).reverse());
+    axislabels.text(function (d, i) { return Format(maxValue * d / cfg.levels); });
+
 
     /////////////////////////////////////////////////////////
     //////////////////// Draw the axes //////////////////////
     /////////////////////////////////////////////////////////
 
     //Create the straight lines radiating outward from the center
-    var axis = this.g.selectAll(".axis")
-      .data(this.allAxis).enter()
+
+    var domAllAxis = this.g.selectAll(".axis")
+      .data(allAxis);
+
+    var axis = domAllAxis.enter()
       .append("g")
       .attr("class", "axis");
     //Append the lines
     axis.append("line")
       .attr("x1", 0)
       .attr("y1", 0)
-      .attr("x2", function (d, i) { return rScale(maxValue * 1.1) * Math.cos(angleSlice * i - Math.PI / 2); })
+      .attr("x2", function (d, i) { console.log("enter", i); return rScale(maxValue * 1.1) * Math.cos(angleSlice * i - Math.PI / 2); })
       .attr("y2", function (d, i) { return rScale(maxValue * 1.1) * Math.sin(angleSlice * i - Math.PI / 2); })
       .attr("class", "line")
       .style("stroke", "white")
@@ -312,8 +358,19 @@ export class RadarChartComponent implements AfterContentInit {
       .attr("y", function (d, i) { return rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice * i - Math.PI / 2); })
       .text(function (d) { return d })
 
+    domAllAxis.select("line")
+      .transition()
+      .duration(200)
+      .attr("x2", function (d, i) { console.log("enter", i); return rScale(maxValue * 1.1) * Math.cos(angleSlice * i - Math.PI / 2); })
+      .attr("y2", function (d, i) { return rScale(maxValue * 1.1) * Math.sin(angleSlice * i - Math.PI / 2); })
 
+    domAllAxis.select(".legend")
+      .transition().duration(200)
+      .attr("x", function (d, i) { return rScale(maxValue * cfg.labelFactor) * Math.cos(angleSlice * i - Math.PI / 2); })
+      .attr("y", function (d, i) { return rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice * i - Math.PI / 2); })
+      .text(function (d) { return d })
 
+    domAllAxis.exit().remove();
     /////////////////////////////////////////////////////////
     ///////////// Draw the radar chart blobs ////////////////
     /////////////////////////////////////////////////////////
@@ -517,7 +574,7 @@ export class RadarChartComponent implements AfterContentInit {
     var partyTooltip = this.g.append("g")
       .attr("transform", "translate(-350, -200)")
       .style("opacity", 0);
-      
+
     partyTooltip.append("rect").attr("width", 280).attr("height", 40)
       .style("fill", "black")
       .attr("rx", 20)

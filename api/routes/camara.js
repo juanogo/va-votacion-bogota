@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Camara = require('../models/Camara.js');
+const type = "Camara";
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -195,7 +196,7 @@ router.post('/groupedbypartyandzone', function (req, res, next) {
         votos: 1,
         anio: "$_id.anio",
         _id: 0,
-        tipo: "Senado"
+        tipo: type
       }
     },
     { $sort: { votos: -1 } },

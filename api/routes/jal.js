@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var JAL = require('../models/JAL.js');
-
+const type = "JAL";
 /* GET home page. */
 router.get('/', function (req, res, next) {
   JAL.aggregate([
@@ -199,7 +199,7 @@ router.post('/groupedbypartyandzone', function (req, res, next) {
         votos: 1,
         anio: "$_id.anio",
         _id: 0,
-        tipo: "Senado"
+        tipo: type
       }
     },
     { $sort : { votos : -1} },
