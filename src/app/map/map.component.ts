@@ -20,8 +20,22 @@ export class MapComponent implements AfterContentInit, OnInit {
   mapgroup;
   colores = ["#3A7F53", "#FFE193", "#CC300A", "#112F41", "#FE7F2D", "#BDD3DE", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray", "gray"];
   scaleColors;
+  private _validar_densidad = false;
+
+  set validar_densidad(_vd) {
+    this._validar_densidad = _vd;
+    this.densidad();
+  }
+
+  get validar_densidad() {
+    return this._validar_densidad;
+  }
+
+  data_nest;
+  scaleVotes;
   private _year;
   private _votation;
+
 
   maxvot = {};
 
@@ -127,7 +141,7 @@ export class MapComponent implements AfterContentInit, OnInit {
 
           this.mapgroup.selectAll(".l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
             .style("fill", this.scaleColors(this.maxvot[locali].partido));
-          
+
           tooltip.transition().duration(100).style("opacity", 0);
           /*
                     div_tooltip.transition()
@@ -198,6 +212,14 @@ export class MapComponent implements AfterContentInit, OnInit {
 
     this.onUpdateScaleColors.emit(this.scaleColors);
 
+    this.data_nest = d3.nest()
+      .key(function (d) { return d.zona; })
+      .rollup(function (v) { return d3.sum(v, function (d) { return d.votos; }); })
+      .entries(this.alldata);
+
+    this.scaleVotes = d3.scaleOrdinal().range([0.4, 1])
+      .domain([d3.min(this.data_nest, function (d) { return d.value }), d3.max(this.data_nest, function (d) { return d.value })]);
+
     this.svg.selectAll(".tract").transition().duration(750)
       .style("fill-opacity", 0.4)
       .style("fill", (d) => {
@@ -205,5 +227,26 @@ export class MapComponent implements AfterContentInit, OnInit {
         return this.scaleColors(this.maxvot[locali].partido)
       });
 
+  }
+
+  densidad() {
+    if (this.validar_densidad) {
+      this.mapgroup.selectAll(".tract").transition().duration(750)
+        .style("fill-opacity",
+          (d) => {
+            var locali = this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"];
+            var votaciones = 0;
+            this.data_nest.forEach((o, i, a) => {
+              if (locali == o.key)
+                votaciones = o.value;
+            })
+
+            return this.scaleVotes(votaciones);
+
+          });
+    } else {
+      this.mapgroup.selectAll(".tract").transition().duration(750)
+        .style("fill-opacity", 0.4);
+    }
   }
 }
