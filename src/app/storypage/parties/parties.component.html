@@ -52,3 +52,35 @@
 
   </div>
 </div>
+
+<div class="insights-btn-container">
+  <button class="btn btn-success" (click)="showInsights = true">Insights</button>
+</div>
+
+
+<clr-wizard #wizardmd [(clrWizardOpen)]="showInsights" clrWizardSize="lg">
+  <clr-wizard-title>Insights</clr-wizard-title>
+
+  <clr-wizard-button [type]="'cancel'">Cancel</clr-wizard-button>
+  <clr-wizard-button [type]="'previous'">Back</clr-wizard-button>
+  <clr-wizard-button [type]="'next'">Next</clr-wizard-button>
+  <clr-wizard-button [type]="'finish'">Finish</clr-wizard-button>
+
+  <clr-wizard-page>
+    <ng-template clrPageTitle>Centro Democrático</ng-template>
+    <img class="insight-img" src="assets/images/insights/insight1-vic.png">
+    <p>El Centro Democrático es un partido que apareció 2014 y con una gran fuerza en la capital. En 2018 aunque tiene
+      la presidencia y mucha fuerza en el senado se nota que está perdiendo popularidad en la capital. Particularmente
+      en 2018 perdieron casi la mitad de los votos respecto a las elecciones anteriores</p>
+  </clr-wizard-page>
+
+  <clr-wizard-page>
+    <ng-template clrPageTitle>Todos se relacionan entre si</ng-template>
+    <img class="insight-img" src="assets/images/insights/insight2-vic.png">
+    <p>No hay sentido pelearse por partidos políticos. Vemos que cuando se trata de conseguir votos casi que se puede
+      decir que todos se relacionan entre sí. Particularmente el partido Cambio Radical se ha unido con muchos otros
+      para conseguir sus objetivos electorales.</p>
+  </clr-wizard-page>
+
+
+</clr-wizard>
