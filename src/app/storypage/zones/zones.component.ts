@@ -10,7 +10,8 @@ export class ZonesComponent implements OnInit {
   validar_densidad = false;
   selected_type = { type: "senado", plusyear: 0 };
   selected_zone = { name: "Todas", value: -1 };
-
+  showInsights = false;
+  
   years = [
     {
       map_name: "svg_2006",

@@ -48,7 +48,7 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
     };
 
     var width = this.width - margin.left - margin.right;
-    var height = 800 - margin.top - margin.bottom;
+    var height = 1000 - margin.top - margin.bottom;
 
     var x = d3.scaleLinear().range([0, width]);
     var strength = d3.scaleLinear().domain([0, d3.max(data.links.map(d => d.value))]).range([1, 5]);
@@ -65,6 +65,15 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
       .domain(data.nodes)
       .range([0, width]);
 
+    g.append('g').call(d3.axisBottom(x)).attr("transform", `translate(0, ${height / 2})`).selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .style("font-size", "7pt")
+      .attr("transform", function (d) {
+        return "rotate(-65)";
+      });
+
     var link = g.append('g')
       .attr('class', 'links')
       .selectAll('path')
@@ -72,9 +81,9 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
       .enter().append('path')
       .attr('id', (l) => { return "link-" + l.id })
       .attr('d', function (d) {
-        var sourcex = x(d.source) + x.bandwidth()/2;
-        var targetx = x(d.target) + x.bandwidth()/2;
-        var ypos = height/2;
+        var sourcex = x(d.source) + x.bandwidth() / 2;
+        var targetx = x(d.target) + x.bandwidth() / 2;
+        var ypos = height / 2;
         return ['M', sourcex, ypos, 'A',
           (sourcex - targetx) / 2, ',',
           (sourcex - targetx) / 2, 0, 0, ',',
@@ -96,8 +105,8 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
       .data(data.nodes)
       .enter()
       .append("circle")
-      .attr("cx", (d) => {return x(d) + x.bandwidth()/2})
-      .attr("cy", height/2)
+      .attr("cx", (d) => { return x(d) + x.bandwidth() / 2 })
+      .attr("cy", height / 2)
       .attr("r", 5)
       .style("fill", "steelblue")
       .on('mouseover', function (d) {
@@ -123,14 +132,7 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
         })
       })
 
-    g.append('g').call(d3.axisBottom(x)).attr("transform", `translate(0, ${height/2})`).selectAll("text")
-      .style("text-anchor", "end")
-      .attr("dx", "-.8em")
-      .attr("dy", ".15em")
-      .style("font-size", "7pt")
-      .attr("transform", function (d) {
-        return "rotate(-65)";
-      });
+
 
     return svgNode.node();
   }

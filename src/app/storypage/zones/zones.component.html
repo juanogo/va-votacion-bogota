@@ -1,22 +1,22 @@
 <div class="main-container">
   <header class="header header-4">
     <div class="branding">
-      <a  class="nav-link">
+      <a class="nav-link">
         <span class="title">Así votan sus localidades</span>
       </a>
     </div>
     <div class="header-nav">
-        <a class="nav-link" (click)="resetZone()"><span class="nav-text">Localidad seleccionada: {{selected_zone.name}}</span></a>
-      </div>
+      <a class="nav-link" (click)="resetZone()"><span class="nav-text">Localidad seleccionada: {{selected_zone.name}}</span></a>
+    </div>
     <div class="header-actions">
       <clr-dropdown>
-          <button class="nav-text" clrDropdownTrigger>
-              Votación: {{currentElection.name}}
-              <clr-icon shape="caret down"></clr-icon>
-          </button>
-          <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
-              <a *ngFor="let e of election_types" clrDropdownItem (click)="setElectionType(e)">{{e.name}}</a>
-          </clr-dropdown-menu>
+        <button class="nav-text" clrDropdownTrigger>
+          Votación: {{currentElection.name}}
+          <clr-icon shape="caret down"></clr-icon>
+        </button>
+        <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
+          <a *ngFor="let e of election_types" clrDropdownItem (click)="setElectionType(e)">{{e.name}}</a>
+        </clr-dropdown-menu>
       </clr-dropdown>
     </div>
   </header>
@@ -52,3 +52,41 @@
     </div>
   </div>
 </div>
+
+<div class="insights-btn-container">
+  <button class="btn btn-success" (click)="showInsights = true">Insights</button>
+</div>
+
+
+<clr-wizard #wizardmd [(clrWizardOpen)]="showInsights" clrWizardSize="lg">
+  <clr-wizard-title>Insights</clr-wizard-title>
+
+  <clr-wizard-button [type]="'cancel'">Cancel</clr-wizard-button>
+  <clr-wizard-button [type]="'previous'">Back</clr-wizard-button>
+  <clr-wizard-button [type]="'next'">Next</clr-wizard-button>
+  <clr-wizard-button [type]="'finish'">Finish</clr-wizard-button>
+
+  <clr-wizard-page>
+    <ng-template clrPageTitle>Presidencia Segunda Vuelta</ng-template>
+    <img class="insight-img" src="assets/images/insights/insight1-alv.png">
+    <p>En las elecciones a presidencia en segunda vuelta el centro democrático no tuvo tanto apoyo en Bogotá en 2014 y
+      en
+      2018 como lo tuvieron sus rivales directos, el partido de Santos y el partido de Petro respectivamente, a pesar
+      de
+      que intercambiaron sus poblaciones objetivos y de que la densidad de votantes en el norte de la ciudad es más
+      alta
+      que en partes del sur como Usme o San Cristobal.</p>
+  </clr-wizard-page>
+
+  <clr-wizard-page>
+    <ng-template clrPageTitle>MAIS, UP, ASI</ng-template>
+    <img class="insight-img" src="assets/images/insights/insight2-alv.png">
+    <p>
+      Los partidos MAIS (Movimiento Alternativo Indígena y Social), UP (Unión patriótica) y ASI (Alianza social
+      independiente) en las votaciones al senado estaban totalmente por fuera del radar político, pero en las
+      elecciones de 2018 no solo subieron sus votantes, sino que quedaron de terceros con más de la mitad de votos de
+      Alianza verde y ganaron en las localidades de Usme y Ciudad Bolivar.
+    </p>
+  </clr-wizard-page>
+
+</clr-wizard>
