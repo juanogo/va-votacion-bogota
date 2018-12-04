@@ -4,6 +4,7 @@ import { HomeLayoutComponent } from './home-layout/home-layout.component'
 import { StorypageComponent } from './storypage/storypage.component';
 import { ZonesComponent } from './storypage/zones/zones.component';
 import { StoryHomeComponent } from './storypage/story-home/story-home.component';
+import { PartiesComponent } from './storypage/parties/parties.component';
 
 const routes: Routes = [{
   path: 'home',
@@ -23,6 +24,10 @@ const routes: Routes = [{
       path: 'zones',
       component: ZonesComponent
     },
+    {
+      path: 'parties',
+      component: PartiesComponent
+    }
   ]
 },
 {

@@ -15,6 +15,7 @@ import { BarchartVotesComponent } from './barchart-votes/barchart-votes.componen
 import { StorypageComponent } from './storypage/storypage.component';
 import { ZonesComponent } from './storypage/zones/zones.component';
 import { StoryHomeComponent } from './storypage/story-home/story-home.component';
+import { PartiesComponent } from './storypage/parties/parties.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { StoryHomeComponent } from './storypage/story-home/story-home.component'
     BarchartVotesComponent,
     StorypageComponent,
     ZonesComponent,
-    StoryHomeComponent
+    StoryHomeComponent,
+    PartiesComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,47 @@
+<div class="main-container">
+  <header class="header-5">
+    <div class="branding">
+      <a class="nav-link">
+        <span class="title">Partidos</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <a *ngFor="let y of years" class="nav-link {{y.active}}" (click)="setCurrentYear(y)"><span class="nav-text">{{y.start}}
+          - {{y.end}}</span></a>
+    </div>
+    <div class="header-actions">
+    </div>
+  </header>
+  <div class="content-container">
+    <div class="content-area">
+      <div class="clr-row">
+        <div class="clr-col-xl-6 clr-col-lg-8 clr-col-md-12 clr-col-sm-12">
+          <div class="card">
+            <div class="card-header">
+              Utiliza el mapa para seleccionar localidades
+            </div>
+            <div class="card-block">
+              <p class="card-text">
+                Al seleccionar una localidad el radar de la derecha se actualizará con la nueva información.
+              </p>
+            </div>
+            <div id="map-container" class="card-img">
+              <app-map (onUpdateScaleColors)="setScaleColors($event)" [width]="700" (onSelectZone)="setZone($event)"
+                [votation]="selected_type" [year]="selected_year"></app-map>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-sm btn-link" (click)="resetZone()">
+                <clr-icon shape="trash"></clr-icon>
+                Localidad Seleccionada: {{selected_zone.name}}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="clr-col-xl-6 clr-col-md-12 clr-col-lg-4 clr-col-sm-12">
+          <app-radar-chart [year]="selected_year" [zone]="selected_zone"></app-radar-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
