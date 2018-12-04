@@ -12,20 +12,42 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
   constructor(private http: HttpClient) { }
 
   partydata = {}
+  svgNode;
 
   @Input() width;
+  @Input() height;
+
+  _showChart = false;
+
+  @Input() set showChart(_sc) {
+    this._showChart = _sc;
+    if (this._showChart) {
+      setTimeout(() => { this.createChart(this.partydata); }, 500);
+
+    }
+  }
+
+  get showChart() {
+    return this._showChart;
+  }
 
   ngOnInit() {
+
   }
 
   ngAfterContentInit() {
     this.http.get<[]>("api/all/getcoaliciones").subscribe((data) => {
       this.partydata = data;
-      this.createChart(this.partydata);
+      //this.createChart(this.partydata);
     });
   }
 
   createChart(data) {
+    this.svgNode = d3.select("#arc-svg2");
+    this.svgNode.selectAll("g").remove();
+
+    console.log("svgNode", this.svgNode.node());
+
     var i, j, node;
     var groupSep = 10;
 
@@ -48,17 +70,17 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
     };
 
     var width = this.width - margin.left - margin.right;
-    var height = 1000 - margin.top - margin.bottom;
+    var height = this.height - margin.top - margin.bottom;
 
     var x = d3.scaleLinear().range([0, width]);
     var strength = d3.scaleLinear().domain([0, d3.max(data.links.map(d => d.value))]).range([1, 5]);
 
-    var svgNode = d3.select("#arc-svg")
-      .attr('class', 'arc')
+
+    this.svgNode.attr('class', 'arc')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
 
-    var g = svgNode.append('g')
+    var g = this.svgNode.append('g')
       .attr('transform', 'translate(' + margin.left + ',-' + margin.top + ')');
 
     var x = d3.scaleBand()
@@ -134,7 +156,7 @@ export class PartyArcDiagramComponent implements OnInit, AfterContentInit {
 
 
 
-    return svgNode.node();
+    return this.svgNode.node();
   }
 
 }

@@ -10,6 +10,7 @@
           - {{y.end}}</span></a>
     </div>
     <div class="header-actions">
+      <button class="btn btn-primary" (click)="showCoaliciones = true">Ver Coaliciones</button>
     </div>
   </header>
   <div class="content-container">
@@ -44,7 +45,7 @@
       </div>
 
       <div class="clr-row">
-        <app-party-arc-diagram [width]="1000"></app-party-arc-diagram>
+        <!--<app-party-arc-diagram [width]="1000"></app-party-arc-diagram>-->
       </div>
 
     </div>
@@ -81,6 +82,18 @@
       decir que todos se relacionan entre sí. Particularmente el partido Cambio Radical se ha unido con muchos otros
       para conseguir sus objetivos electorales.</p>
   </clr-wizard-page>
-
-
 </clr-wizard>
+
+<clr-modal [(clrModalOpen)]="showCoaliciones" [clrModalClosable]="false" [clrModalSize]="'xl'">
+  <h3 class="modal-title">Cómo se relacionan los partidos?</h3>
+  <div class="modal-body">
+    <div class="clr-row clr-justify-content-center">
+      <app-party-arc-diagram [width]="800" [height]="800" [showChart]="showCoaliciones"></app-party-arc-diagram>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="showCoaliciones = false">
+      cerrar
+    </button>
+  </div>
+</clr-modal>

@@ -8,6 +8,8 @@ import { Component, OnInit } from '@angular/core';
 export class PartiesComponent implements OnInit {
 
   showInsights = false;
+  showCoaliciones = false;
+  
   years = [{ start: 2006, end: 2010, active: "active" },
   { start: 2010, end: 2014, active: "" },
   { start: 2014, end: 2018, active: "" },
