@@ -1,0 +1,24 @@
+h1 {
+    font-size: 4em !important;
+}
+
+.full-height {
+    height: 100% !important;
+}
+
+.head {
+    font-size: 18px !important;
+}
+
+.tools-container {
+    background-color: white;
+}
+
+.home-tool-container {
+    text-align: center;
+    padding: 2em;
+}
+
+.home-tool-logo {
+    width: 70px;
+}

@@ -14,6 +14,9 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
   private _zone;
   private _scaleColors;
 
+  @Input() svg_id = "legend";
+  @Input() width = 300;
+
   @Input() set votation(_v) {
     this._votation = _v;
     if (typeof (this._votation !== 'undefined'))
@@ -35,10 +38,14 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
   @Input() set scaleColors (_sc) {
     //console.log("fijando la escala de colores en el barchart", _sc)
     this._scaleColors = _sc;
+    this.updateData();
     //console.log(typeof(this._scaleColors));
   };
 
   updateData() {
+    if (typeof(this._scaleColors) === "undefined"){
+      return;
+    }
     var options = {};
     options['anio'] = this._year + this._votation.plusyear;
     if (typeof(this._zone) !== 'undefined' && this._zone.value !== -1){
@@ -116,13 +123,13 @@ export class BarchartVotesComponent implements OnInit, AfterContentInit {
     partidos = partidos.sort(function (x, y) {
       return d3.descending(datos_partidos[x].votos, datos_partidos[y].votos);
     });
-    var svg = d3.select("#legend"),
-      width = +svg.attr("width"),
-      height = +svg.attr("height");
+    var svg = d3.select(`#${this.svg_id}`).attr("width", this.width);
+    
+    var  height = +svg.attr("height");
 
     var scaleBars = d3.scaleLinear()
       .domain([d3.min(partidos, d => datos_partidos[d].votos), d3.max(partidos, d => datos_partidos[d].votos)])
-      .range([30, width]);
+      .range([30, this.width]);
     var altura = 25;
 
     var index = 0;

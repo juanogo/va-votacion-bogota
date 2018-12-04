@@ -12,6 +12,9 @@ import { HeaderComponent } from './home-layout/header/header.component';
 import { RadarChartComponent } from './radar-chart/radar-chart.component';
 import { MapComponent } from './map/map.component';
 import { BarchartVotesComponent } from './barchart-votes/barchart-votes.component';
+import { StorypageComponent } from './storypage/storypage.component';
+import { ZonesComponent } from './storypage/zones/zones.component';
+import { StoryHomeComponent } from './storypage/story-home/story-home.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +23,10 @@ import { BarchartVotesComponent } from './barchart-votes/barchart-votes.componen
     HeaderComponent,
     RadarChartComponent,
     MapComponent,
-    BarchartVotesComponent
+    BarchartVotesComponent,
+    StorypageComponent,
+    ZonesComponent,
+    StoryHomeComponent
   ],
   imports: [
     BrowserModule,

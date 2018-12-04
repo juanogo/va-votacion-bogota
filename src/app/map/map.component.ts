@@ -9,8 +9,21 @@ import * as d3 from 'd3';
 })
 export class MapComponent implements AfterContentInit, OnInit {
   @Input() width;
+  @Input() svg_id = "svg_map";
+  @Input() show_zone_tooltip = true;
   @Output() onSelectZone: EventEmitter<any> = new EventEmitter();
+  @Output() onOverZone: EventEmitter<any> = new EventEmitter();
   @Output() onUpdateScaleColors: EventEmitter<any> = new EventEmitter();
+
+  @Input() set validar_densidad(_vd) {
+    console.log("densidad", _vd);
+    this._validar_densidad = _vd;
+    this.densidad();
+  }
+
+  get validar_densidad() {
+    return this._validar_densidad;
+  }
 
   localidadesColorScale;
   localidades_barrios;
@@ -22,15 +35,6 @@ export class MapComponent implements AfterContentInit, OnInit {
   scaleColors;
   private _validar_densidad = false;
 
-  set validar_densidad(_vd) {
-    this._validar_densidad = _vd;
-    this.densidad();
-  }
-
-  get validar_densidad() {
-    return this._validar_densidad;
-  }
-
   data_nest;
   scaleVotes;
   private _year;
@@ -41,14 +45,17 @@ export class MapComponent implements AfterContentInit, OnInit {
 
   @Input() set votation(_v) {
     this._votation = _v;
-    if (typeof (this._votation !== 'undefined'))
-      this.updateData();
+    //if (typeof (this._votation !== 'undefined'))
+    //this.updateData();
   };
 
   @Input() set year(_y: String) {
     this._year = _y;
-    //console.log("set year to barchart");
-    this.updateData();
+    //console.log("set year to barchart");ç
+    setTimeout(() => {
+      this.updateData();
+    }, 500);
+
   };
 
   constructor(private http: HttpClient) {
@@ -74,7 +81,7 @@ export class MapComponent implements AfterContentInit, OnInit {
 
 
     d3.json("assets/data/bogota_cadastral.json").then((data) => {
-      this.svg = d3.select("#net_canvas").attr("width", this.width).attr("height", (+this.width) / 2);
+      this.svg = d3.select(`#${this.svg_id}`).attr("width", this.width).attr("height", (+this.width) / 2);
       this.mapgroup = this.svg.append("g").attr("transform", "translate(0, 0)");
 
       var tooltip = this.svg.append("g")
@@ -137,12 +144,19 @@ export class MapComponent implements AfterContentInit, OnInit {
           this.onSelectZone.emit({ name: l["Localidad"], value: l["Codigo Localidad"] })
         })
         .on("mouseout", (d) => {
+          this.onOverZone.emit({ name: "Todas", value: -1 })
           var locali = this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"];
 
-          this.mapgroup.selectAll(".l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
-            .style("fill", this.scaleColors(this.maxvot[locali].partido));
-
+          if (typeof (this.maxvot[locali]) !== "undefined") {
+            this.mapgroup.selectAll(".l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
+              .style("fill", this.scaleColors(this.maxvot[locali].partido));
+          }
+          else {
+            this.mapgroup.selectAll(".l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
+              .style("fill", this.localidadesColorScale(this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"]));
+          }
           tooltip.transition().duration(100).style("opacity", 0);
+
           /*
                     div_tooltip.transition()
                       .duration(200)
@@ -151,10 +165,16 @@ export class MapComponent implements AfterContentInit, OnInit {
           */
         })
         .on("mouseover", (d) => {
-          tooltip.transition().duration(100).style("opacity", 1);
+
+          if (this.show_zone_tooltip) {
+            tooltip.transition().duration(100).style("opacity", 1);
+          }
           tooltip.select(".ltooltip").text(this.localidades_barrios[d.properties.scacodigo]["Localidad"])
           this.mapgroup.selectAll(".l-" + this.localidades_barrios[d.properties.scacodigo]["Codigo Localidad"])
             .style("fill", "FF9800");
+
+          var l = this.localidades_barrios[d.properties.scacodigo];
+          this.onOverZone.emit({ name: l["Localidad"], value: l["Codigo Localidad"] })
         })
 
     });
@@ -243,6 +263,9 @@ export class MapComponent implements AfterContentInit, OnInit {
   }
 
   densidad() {
+    if (typeof (this.mapgroup) == "undefined") {
+      return;
+    }
     if (this.validar_densidad) {
       this.mapgroup.selectAll(".tract").transition().duration(750)
         .style("fill-opacity",

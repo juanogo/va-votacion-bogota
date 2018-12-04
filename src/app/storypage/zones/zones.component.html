@@ -1,0 +1,54 @@
+<div class="main-container">
+  <header class="header header-4">
+    <div class="branding">
+      <a  class="nav-link">
+        <span class="title">Así votan sus localidades</span>
+      </a>
+    </div>
+    <div class="header-nav">
+        <a class="nav-link" (click)="resetZone()"><span class="nav-text">Localidad seleccionada: {{selected_zone.name}}</span></a>
+      </div>
+    <div class="header-actions">
+      <clr-dropdown>
+          <button class="nav-text" clrDropdownTrigger>
+              Votación: {{currentElection.name}}
+              <clr-icon shape="caret down"></clr-icon>
+          </button>
+          <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
+              <a *ngFor="let e of election_types" clrDropdownItem (click)="setElectionType(e)">{{e.name}}</a>
+          </clr-dropdown-menu>
+      </clr-dropdown>
+    </div>
+  </header>
+  <div class="content-container">
+    <div class="content-area">
+      <div class="clr-row clr-justify-content-end">
+        <div class="toggle-switch">
+          <input type="checkbox" id="toggle_1" [(ngModel)]="validar_densidad">
+          <label for="toggle_1">Densidad de votación</label>
+        </div>
+      </div>
+
+      <div class="clr-row clr-justify-content-center">
+        <div class="col-lg-3" *ngFor="let year of years">
+          <div class="card">
+            <div class="card-header">
+              {{year.start}} - {{year.end}}
+            </div>
+            <div class="card-block">
+              <div class="card-title">
+                <app-map [width]="300" (onUpdateScaleColors)="year.scaleColors = $event" [svg_id]="year.map_name"
+                  (onSelectZone)="setZone($event)" [validar_densidad]="validar_densidad" [votation]="currentElection"
+                  [year]="year.start" [show_zone_tooltip]="false"></app-map>
+              </div>
+              <div class="card-text">
+                <app-barchart-votes [svg_id]="year.bar_name" [width]="300" [scaleColors]="year.scaleColors" [votation]="currentElection"
+                  [year]="year.start" [zone]="selected_zone"></app-barchart-votes>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
