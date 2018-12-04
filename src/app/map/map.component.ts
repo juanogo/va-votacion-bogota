@@ -46,7 +46,9 @@ export class MapComponent implements AfterContentInit, OnInit {
   @Input() set votation(_v) {
     this._votation = _v;
     //if (typeof (this._votation !== 'undefined'))
-    //this.updateData();
+    setTimeout(() => {
+      this.updateData();
+    }, 500);
   };
 
   @Input() set year(_y: String) {
