@@ -17,7 +17,7 @@ export class CorrelationsComponent implements OnInit, AfterContentInit {
   partidos = [];
   datos_por_anio = [];
   datos_aggr = [];
-  columns = ["Senado", "Camara", "Concejo", "Alcaldia", "PresidenciaV1", "PresidenciaV2", "JEP"]
+  columns = ["Senado", "Camara", "Concejo", "Alcaldia", "PresidenciaV1", "PresidenciaV2", "JAL"]
   extent = [-1, 1];
 
   //Variables de la viz
@@ -146,7 +146,7 @@ export class CorrelationsComponent implements OnInit, AfterContentInit {
       .attr("transform", (d, i) => `translate(1, ${(this.height * i) + this.cellSize * 1.5})`);
 
     t1.append("text")
-      .attr("x", 860)
+      .attr("x", 680)
       .attr("y", this.height / 2)
       .attr("font-weight", "bold")
       .attr("text-anchor", "start")
@@ -179,6 +179,34 @@ export class CorrelationsComponent implements OnInit, AfterContentInit {
       .attr("x", -10)
       .attr("text-anchor", "end")
     contenedor_ejey.exit().remove();
+
+    d3.selectAll("rect")
+		.on("mouseover", (d) => {
+
+			//d3.select(this).classed("selected", true);
+			
+			this.tooltip.transition()
+				.duration(300)
+				.style("opacity", .75);
+
+			this.tooltip.html( d.column_x + ", " + d.column_y + " = "+d.correlation.toFixed(2))
+				.style("left", (d3.event.pageX) + "px")
+				.style("top", (d3.event.pageY + 10) + "px");
+
+		})
+		.on("mouseout", () => {
+
+		  	d3.selectAll("rect").classed("selected", false);
+
+		  	 this.tooltip.transition()
+			    .duration(300)
+			    .style("opacity", 0);
+
+		})
+		.on("mousemove", () => {
+		    this.tooltip.style("left", (d3.event.pageX) + "px")
+		    .style("top", (d3.event.pageY + 10) + "px");
+		});
 
   }
 
