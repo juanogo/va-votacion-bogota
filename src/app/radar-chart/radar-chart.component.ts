@@ -67,54 +67,72 @@ export class RadarChartComponent implements AfterContentInit {
         this.updatePartyAxis(datav[i], "Senado");
       }
       this.allElectionTypes.push("Senado");
-      this.http.post<[]>("api/camara/groupedbypartyandzone", options).subscribe((dataa) => {
-        this.databyelection = this.databyelection.concat(dataa);
-        for (var i = 0; i < dataa.length; i++) {
 
-          this.updatePartyAxis(dataa[i], "Camara");
+      this.http.post<[]>("api/presidencia_v1/groupedbypartyandzone", options).subscribe((datav) => {
+        this.databyelection = this.databyelection.concat(datav);
+        for (var i = 0; i < datav.length; i++) {
+          this.updatePartyAxis(datav[i], "PresidenciaV1");
         }
-        this.allElectionTypes.push("Camara");
-        options.anio = options.anio + 1;
-        this.http.post<[]>("api/alcaldia/groupedbypartyandzone", options).subscribe((dataa) => {
-          this.databyelection = this.databyelection.concat(dataa);
-          for (var i = 0; i < dataa.length; i++) {
+        this.allElectionTypes.push("PresidenciaV1");
 
-            this.updatePartyAxis(dataa[i], "Alcaldia");
+        this.http.post<[]>("api/presidencia_v2/groupedbypartyandzone", options).subscribe((datav) => {
+          this.databyelection = this.databyelection.concat(datav);
+          for (var i = 0; i < datav.length; i++) {
+            this.updatePartyAxis(datav[i], "PresidenciaV2");
           }
-          this.allElectionTypes.push("Alcaldia");
-          this.http.post<[]>("api/concejo/groupedbypartyandzone", options).subscribe((datacon) => {
-            this.databyelection = this.databyelection.concat(datacon);
-            for (var i = 0; i < datacon.length; i++) {
+          this.allElectionTypes.push("PresidenciaV2");
 
-              this.updatePartyAxis(datacon[i], "Concejo");
+          this.http.post<[]>("api/camara/groupedbypartyandzone", options).subscribe((dataa) => {
+            this.databyelection = this.databyelection.concat(dataa);
+            for (var i = 0; i < dataa.length; i++) {
+
+              this.updatePartyAxis(dataa[i], "Camara");
             }
-            this.allElectionTypes.push("Concejo");
-            this.http.post<[]>("api/jal/groupedbypartyandzone", options).subscribe((datacon) => {
-              this.databyelection = this.databyelection.concat(datacon);
-              for (var i = 0; i < datacon.length; i++) {
+            this.allElectionTypes.push("Camara");
+            options.anio = options.anio + 1;
 
-                this.updatePartyAxis(datacon[i], "JAL");
+            this.http.post<[]>("api/alcaldia/groupedbypartyandzone", options).subscribe((dataa) => {
+              this.databyelection = this.databyelection.concat(dataa);
+              for (var i = 0; i < dataa.length; i++) {
+
+                this.updatePartyAxis(dataa[i], "Alcaldia");
               }
+              this.allElectionTypes.push("Alcaldia");
+              this.http.post<[]>("api/concejo/groupedbypartyandzone", options).subscribe((datacon) => {
+                this.databyelection = this.databyelection.concat(datacon);
+                for (var i = 0; i < datacon.length; i++) {
 
-              this.allElectionTypes.push("JAL");
-
-              //console.log(this.databyelection);
-              this.allPartyNames = [];
-              this.databyelection = this.databyelection.map((d) => {
-                if (!this.allPartyNames.includes(d.partido)) {
-                  this.allPartyNames.push(d.partido);
+                  this.updatePartyAxis(datacon[i], "Concejo");
                 }
-                return { axis: d.partido, value: d.votos, tipo: d.tipo }
-              });
-              this.databyelection = d3.nest()
-                .key(function (d) { return d.tipo; })
-                .entries(this.databyelection);
-              this.databyelection = this.databyelection.map((d) => { return { name: d.key, values: d.values } })
+                this.allElectionTypes.push("Concejo");
+                this.http.post<[]>("api/jal/groupedbypartyandzone", options).subscribe((datacon) => {
+                  this.databyelection = this.databyelection.concat(datacon);
+                  for (var i = 0; i < datacon.length; i++) {
 
-              this.databyparty = this.databyparty.filter((d) => { return d.values.length > 2 });
+                    this.updatePartyAxis(datacon[i], "JAL");
+                  }
 
-              //console.log(this.databyelection);
-              this.drawRadar();
+                  this.allElectionTypes.push("JAL");
+
+                  //console.log(this.databyelection);
+                  this.allPartyNames = [];
+                  this.databyelection = this.databyelection.map((d) => {
+                    if (!this.allPartyNames.includes(d.partido)) {
+                      this.allPartyNames.push(d.partido);
+                    }
+                    return { axis: d.partido, value: d.votos, tipo: d.tipo }
+                  });
+                  this.databyelection = d3.nest()
+                    .key(function (d) { return d.tipo; })
+                    .entries(this.databyelection);
+                  this.databyelection = this.databyelection.map((d) => { return { name: d.key, values: d.values } })
+
+                  this.databyparty = this.databyparty.filter((d) => { return d.values.length > 2 });
+
+                  //console.log(this.databyelection);
+                  this.drawRadar();
+                })
+              })
             })
           })
         })
