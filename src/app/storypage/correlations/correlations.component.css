@@ -1,0 +1,51 @@
+rect.selected {
+    stroke: #000;
+    stroke-width: 2px;
+  }
+
+   .axis .domain {
+    display: none;
+  }
+    
+.icono {
+  position: relative;
+  left: 3px;
+  top: 10px;
+  width: 200px;
+}
+
+.viz {
+
+  position: relative;
+}
+
+.title_ppal {
+   font-size: 30px;
+   position: relative;
+   left: 10px;
+   top: 15px;
+   width: 200px;
+}
+
+.title {
+    font-size: 20px;
+}
+
+.textos {
+  position: relative;
+  left: 20px;
+}
+
+div.tooltip {
+    position: absolute;
+    background-color: #25333D;
+    max-width: 200px;
+    height: auto;
+    padding: 8px;
+    border-radius: 4px;
+    border-width: 1px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, .5);
+    pointer-events: none;
+    color: white;
+    font-size: 10px;
+  }

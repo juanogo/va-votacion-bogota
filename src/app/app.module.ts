@@ -16,6 +16,7 @@ import { StorypageComponent } from './storypage/storypage.component';
 import { ZonesComponent } from './storypage/zones/zones.component';
 import { StoryHomeComponent } from './storypage/story-home/story-home.component';
 import { PartiesComponent } from './storypage/parties/parties.component';
+import { CorrelationsComponent } from './storypage/correlations/correlations.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { PartiesComponent } from './storypage/parties/parties.component';
     StorypageComponent,
     ZonesComponent,
     StoryHomeComponent,
-    PartiesComponent
+    PartiesComponent,
+    CorrelationsComponent
   ],
   imports: [
     BrowserModule,
