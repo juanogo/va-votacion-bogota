@@ -43,6 +43,8 @@ export class ZonesComponent implements OnInit {
   { type: "alcaldia", name: "Alcaldía", plusyear: 1 },
   { type: "concejo", name: "Concejo", plusyear: 1 },
   { type: "JAL", name: "JAL", plusyear: 1 },
+  { type: "presidencia_v1", name: "PresidenciaV1", plusyear: 0 },
+  { type: "presidencia_v2", name: "PresidenciaV2", plusyear: 0 },
   ]
 
   currentElection = this.election_types[0];
