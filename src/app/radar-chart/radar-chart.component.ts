@@ -527,45 +527,52 @@ export class RadarChartComponent implements AfterContentInit {
     ////////////////////////////////////////////
     /////////// Legend ////////////////
     ////////////////////////////////////////////
-    /*
-        if (cfg.legednames != null) {
-          var text = this.svg.append("text")
-            .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
-            .attr("y", cfg.ypos - radius + cfg.legendoptions_ycorretion)
-            .attr("font-size", cfg.legendoptions_legendsize + "px")
-            .attr("fill", cfg.textColor)
-            .text(cfg.legendoptions_legendtitle);
-    
-          //Initiate Legend	
-          var legend = this.svg.append("g")
-            .attr("class", "legend")
-            .attr("height", 100)
-            .attr("width", 200)
-            ;
-          //Create colour squares
-          legend.selectAll('rect')
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
-            .attr("y", function (d, i) { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines; })
-            .attr("width", cfg.legendoptions_patchsquaresize)
-            .attr("height", cfg.legendoptions_patchsquaresize)
-            .style("fill", (d) => { return cfg.color(d.name); })
-            ;
-          //Create text next to squares
-          legend.selectAll('text')
-            .data(data)
-            .enter()
-            .append("text")
-            .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion + cfg.legendoptions_xpadafterpatch)
-            .attr("y", (d, i) => { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines + cfg.legendoptions_ypadposbetweenpatchandtext })
-            .attr("font-size", cfg.legendoptions_legendsize + "px")
-            .attr("fill", cfg.textColor)
-            .text(function (d) { return d.name + ": " + d.total; })
-            ;
-        }//legendnames
-    */
+
+    if (cfg.legednames != null) {
+      this.g.select(".legend-g").remove();
+
+      var legend_g = this.g.append("g").attr("class", "legend-g");
+      var text = legend_g.append("text")
+        .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
+        .attr("y", cfg.ypos - radius + cfg.legendoptions_ycorretion)
+        .attr("font-size", cfg.legendoptions_legendsize + "px")
+        .attr("fill", cfg.textColor)
+        .text(cfg.legendoptions_legendtitle);
+
+      //Initiate Legend	
+      var legend = legend_g.append("g")
+        .attr("transform", "translate(-1000,110)")
+        .attr("class", "legend")
+        .attr("height", 100)
+        .attr("width", 200)
+        ;
+      //Create colour squares
+      legend.selectAll('.legend-rect')
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "legend-rect")
+        .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion)
+        .attr("y", function (d, i) { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines; })
+        .attr("width", cfg.legendoptions_patchsquaresize)
+        .attr("height", cfg.legendoptions_patchsquaresize)
+        .style("fill", (d) => { return cfg.color(d.name); });
+
+      //Create text next to squares
+      legend.selectAll('.legend-text')
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("class", "legend-text")
+        .attr("x", cfg.xpos + radius + cfg.legendoptions_xcorretion + cfg.legendoptions_xpadafterpatch)
+        .attr("y", (d, i) => { return cfg.ypos - radius + cfg.legendoptions_ycorretion + cfg.legendoptions_ypadaftertitle + i * cfg.legendoptions_ypadbetweenlines + cfg.legendoptions_ypadposbetweenpatchandtext })
+        .attr("font-size", cfg.legendoptions_legendsize + "px")
+        .attr("fill", cfg.textColor)
+        .text(function (d) { return d.name });
+
+      legend.selectAll('.legend-text').data(data).exit().remove();
+    }//legendnames
+
 
 
     /////////////////////////////////////////////////////////
