@@ -6,6 +6,7 @@ var PresidenciaV1 = require('../models/PresidenciaV1.js');
 var PresidenciaV2 = require('../models/PresidenciaV2.js');
 var Camara = require('../models/Camara.js');
 var Concejo = require('../models/Concejo.js');
+var Partidos = require("../models/Partidos.js");
 var JAL = require('../models/JAL.js');
 
 router.get('/groupedbyparty', function (req, res, next) {
@@ -75,5 +76,47 @@ function getGroupedData(collection, typeName, callback) {
         callback(err, votes);
     });
 }
+
+router.get("/getcoaliciones", function (req, res, next) {
+    Partidos.find({ nombre: /.*;.*/ }, (err, ps) => {
+        if (err) res.json("error looking parties");
+        else {
+            var data = {nodes: [], links:[]};
+            for (var i = 0; i < ps.length; i++){
+                var d = ps[i];
+                var names = d['nombre'].split(";");
+
+                for (var j = 0; j < names.length; j++){
+                    for (var k = j+1; k < names.length; k++) {
+
+                        if (!data.nodes.includes(names[j])) {
+                            data.nodes.push(names[j]);
+                        }
+                        if (!data.nodes.includes(names[k])) {
+                            data.nodes.push(names[k]);
+                        }
+
+                        var link = null;
+                        for (var l = 0; l < data.links.length; l++){
+                            
+                            if (data.links[l].source === names[j] && data.links[l].target === names[k] ||
+                                data.links[l].target === names[j] && data.links[l].source === names[k]){
+                                    link = data.links[l];
+                                    break;
+                                }
+                        }
+
+                        if (link !== null) {
+                            link.value = link.value + 1;
+                        }else {
+                            data.links.push({source: names[j], target: names[k], value: 1})
+                        }
+                    }
+                }
+            }
+            res.json(data);
+        }
+    })
+});
 
 module.exports = router;

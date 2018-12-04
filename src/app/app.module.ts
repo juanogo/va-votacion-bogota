@@ -17,6 +17,7 @@ import { ZonesComponent } from './storypage/zones/zones.component';
 import { StoryHomeComponent } from './storypage/story-home/story-home.component';
 import { PartiesComponent } from './storypage/parties/parties.component';
 import { CorrelationsComponent } from './storypage/correlations/correlations.component';
+import { PartyArcDiagramComponent } from './party-arc-diagram/party-arc-diagram.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { CorrelationsComponent } from './storypage/correlations/correlations.com
     ZonesComponent,
     StoryHomeComponent,
     PartiesComponent,
-    CorrelationsComponent
+    CorrelationsComponent,
+    PartyArcDiagramComponent
   ],
   imports: [
     BrowserModule,
