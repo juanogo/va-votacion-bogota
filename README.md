@@ -31,7 +31,8 @@ https://votbogota.herokuapp.com/story/home
 - [Víctor Garzón Marín](https://www.linkedin.com/in/v%C3%ADctor-garz%C3%B3n-mar%C3%ADn-25984b27/)
 
 ## Paper
-- [Paper](https://drive.google.com/file/d/19BerRfq1pZlTcI55rhCR3q0uQSlN-SYT/view)
+- [Google Drive](https://drive.google.com/file/d/19BerRfq1pZlTcI55rhCR3q0uQSlN-SYT/view)
+- [Download](https://github.com/vgarzom/va-votacion-bogota/raw/master/paper/Paper%20-%20How%20does%20Bogota%20vote.pdf)
 
 ## how to run
 1. clone the repository
